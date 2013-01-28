@@ -7023,26 +7023,26 @@ app.build.js를 ( 소스와 릴리즈 디렉토리 모두에 같은 레벨로 ) 
 })
 ```
 
-The above build profile is designed for balancing scalability and performance.
+위의 빌드 프로파일은 확장성과 성능의 균형을 맞춰 설계되었다
 
-**Examples of the grouped sets of code dependencies**
+**코드 의존성들을 묶은 예제**
 
-The contents of the vendor.js which is not built into a package may use some *no conflict* calls as well.
+패키지에 빌드되지 않은 vendor.js의 내용은 *no conflict* 호출도 사용한다
 
 ```javascript
-// List of vendor libraries, e.g. jQuery, Underscore, Backbone, etc.
-// this module is used with the r.js optimizer tool during build
+// 벤더 라이브러리 목록. 예를 들면, jQuery, Underscore, Backbone 등등
+// 이 모듈은 빌드 중에 r.js 최적화 도구와 함께 사용된다.
 // @see <http://requirejs.org/docs/faq-optimization.html>
 define([ 'jquery', 'underscore', 'backbone', 'modernizr', 'mustache' ],
 function ($,        _,            Backbone,   Modernizr,   Mustache) {
-    // call no conflicts so if needed you can use multiple versions of $
+    // $의 여러 버젼을 사용할 필요도 있다면 no conflict을 호출해라.
     $.noConflict();
     _.noConflict();
     Backbone.noConflict();
 });
 ```
 
-For your application common library code.
+어플리케이션을 위한 공통 라이브러리 코드.
 
 ```javascript
 // List of utility libraries,
@@ -7054,18 +7054,18 @@ function (ajax,         baselib,         localstorage,         debug) {
         'localstorage' : localstorage,
         'debug' : debug
     };
-    // the shim only extend JavaScript when needed, e.g. Object.create
+    // 필요할 때면( 예를 들어 객체 생성시 ) 자바스크립트를 확장한 구문
 });
 ```
 
-An example where you intend to use require the common models in another package file.
+다른 패키지 파일에서 공통 모델을 필요로 할 때의 예제
 
 ```javascript
-// List of models
-// models in this directory are intended for site-wide usage
-// grouping site-wide models in this module (object)
-// optimizes the performance and keeps dependencies organized
-// when the (build) optimizer is run.
+// 모델 목록
+// 이 디렉토리의 모델들은 사이트 전반에 사용된다
+// 이 모듈( 객체 )의 사이트 전반의 모델을 묶는 것은
+// ( 빌드 ) 최적화기가 실행될 때,
+// 성능을 최적화하고 결합된 의존성을 유지한다.
 define([ 'models/branding', 'models/section' ],
 function (Branding,          Section) {
     return {
@@ -7075,68 +7075,68 @@ function (Branding,          Section) {
 });
 ```
 
-#### A quick note on code standards
+#### 코드 표준의 간단한 메모
 
-Notice that in the above examples the parameters may begin with lower or upper case characters. The variable names uses in the parameters that begin with *Uppercase* are *Constructors* and the *lowercase* variable names are not, they may be instances created by a constructor, or perhaps an object or function that is not meant to used with *new*.
+위의 예제에서 파라미터가 소문자나 대문자로 시작할 수 있음을 주의해라. *대문자*로 시작하는 파라미터 변수명은 *생성자*이고 *소문자* 변수명은 그렇지 않고 생성자에 의해 성성된 객체일 수도 있고 혹은 *new*를 사용하지 않는 객체나 함수일 수도 있다.
 
-The convention recommended is to use Upper CamelCase for constructors and lower camelCase for others.
+추천하는 스타일은 생성자에는 대문자로 시작하는 카멜 노테이션을 사용하고, 다른 곳에는 소문자 카멜 노테이션을 사용하는 것이다.
 
-#### Common Pitfall when organizing code in modules
+#### 모듈의 코드를 최적화할 때, 일반적인 위험
 
-Be careful not define circular dependencies. For example, in a common *models* package (models.js) dependencies are listed for the files in your models directory
+순환 의존성을 정의하지 않도록 주의해라. 예를들어, 공통 *모델들* 패키지( models.js ) 의존성이 모델 디렉토리의 파일을 기정하고 있다.
 
     define([ 'models/branding', 'models/section' ], function (branding, section)
     // ...
     return { 'branding' : branding, 'section', section }
 
-Then when another packages requires a common model you can access the models objects returned from your common models.js file like so...
+그리고 나서 다른 패키지가 공통 모델을 필요로 한다면, 공통 models.js에서 모델 객체를 다음과 같이 접근할 수 있다..
 
     define([ 'models', 'utils' ], function (models, utils) {
     var branding = models.branding, debug = utils.debug;
 
-Perhaps after using the model a few times you get into the habit of requiring "model". Later you need add another common model with extends a model you already defined. So the pitfall begins, you add a new model inside your models directory and add a reference this same model in the model.js:
+아마 모델을 몇번 쓰고난 후, "모델"을 습관적으로 사용한다. 나중에 당신은 이미 정의된 모델을 extends로 다른 공통 모델로 추가할 필요가 있다. 당신이 새로운 모델을 모델 디렉토리에 추가하고 model.js에 이 모델의 참조를 추가해서 위험은 시작된다:
 
     define([ 'models/branding', 'models/section', 'models/section-b' ], function (branding, section)
     // ...
     return { 'branding' : branding, 'section', section, 'section-b' : section-b }
 
-However in your *models/section-b.js* file you define a dependency using the model.js which returns the models in an object like so...
+하지만 *model/section-b.js* 파일에서 모델을 객체로 다음과 같이 반환하는 model.js를 사용하는 의존성을 정의한다...
 
     define([ 'models' ], function (models, utils) {
     var section = models.section;
 
-Above is the mistake in models.js a dependency was added for models/section-b and in section-b a dependency is defined for model. The new models/section-b.js requires *model* and model.js requires *models/section-b.js* - a circular dependency. This should result in a load timeout error from RequireJS, but not tell you about the circular dependency.
+위에서 models.js내에 실수가 있다. models/section-b를 위한 의존성이 추가되었다. section-b에서 모델을 위한 의존성이 정의되었다. 새로운 models/section-b.js는 *모델*을 필요로 하고, model.js는 *models/section-b.js*를 필요로 한다 - 순환 의존성이다. 이것은 RequireJS에서 로드 시즘에 에러를 내지만 순환 의존성에 대해 말하지 않는다.
 
-For other common mistakes see the [COMMON ERRORS](http://requirejs.org/docs/errors.html 'RequireJS common errors page') page on the RequireJS site.
+다른 실수들에 대허서는 RequireJS 사이트의 [COMMON ERRORS](http://requirejs.org/docs/errors.html 'RequireJS common errors page') 페이지를 보라.
 
-#### Executing the Build with r.js
+#### r.js로 빌드 실행하기
 
-If you intalled r.js with Node's npm (package manager) like so...
+당신이 다음과 같이 노드의 npm( 패키지 관리자 )로 r.js를 설치했다면...
 
     > npm install requirejs
 
-...you can execute the build on the command line:
+...커맨드 라인상에서 빌드를 실행할 수 있다:
 
     > r.js -o app.build.js
 
 
-## Exercise: Building a modular Backbone app with AMD & RequireJS
+## 연습: AMD와 RequireJS로 모듈화된 Backbone 앱 빌드하기
 
-In this chapter, we'll look at our first practical Backbone & RequireJS project - how to build a modular Todo application. The application will allow us to add new todos, edit new todos and clear todo items that have been marked as completed. For a more advanced practical, see the section on mobile Backbone development.
+이번 챕터에서 우리는 우리의 첫번째 Backbone과 RequireJS 프로젝트를 볼 것이다 - 모듈화된 할일 어플리케이션을 빌드하는 방법. 어플리케이션은 우리가 새로운 할일을 추가하고, 할일 항목을 수정하고, 완료로 표시된 할일 항목 모두를 지울 수 있게 한다. 더 발전된 예를 위해 모바일 Backbone 개발의 섹션을 보라.
 
-The complete code for the application can can be found in the `practicals/modular-todo-app` folder of this repo (thanks to Thomas Davis and J&eacute;r&ocirc;me Gravel-Niquet). Alternatively grab a copy of my side-project [TodoMVC](https://github.com/addyosmani/todomvc) which contains the sources to both AMD and non-AMD versions.
+어플리케이션에 대한 전체 코드는 이 저장소의 `practicals/modular-todo-app` 폴더에서 찾을 수 있다.( Thomas Davis와 J&eacute;r&ocirc;me Gravel-Niquet 에게 감사한다 ). 아니면, AMD와 AMD가 아닌 버젼 모두가 있는 내 부수 프로젝트 [TodoMVC](https://github.com/addyosmani/todomvc) 에서 복사본을 가져가라.
 
-**Note:** Thomas may be covering a practical on this exercise in more detail on [backbonetutorials.com](http://backbonetutorials.com) at some point soon, but for this section I'll be covering what I consider the core concepts.
+**주의:** Thomas는 이 연습에 대한 어떤 것들을 [backbonetutorials.com](http://backbonetutorials.com)에 더 자세히 다루기도 하지만, 이 섹션에서 나는 내가 핵심 개념이라고 생각되는 것을 다룰 것이다.
 
-### Overview
+### 개략도
 
-Writing a 'modular' Backbone application can be a straight-forward process. There are however, some key conceptual differences to be aware of if opting to use AMD as your module format of choice:
+'모듈화된' Backbone 어플리케이션을 작성하는 것은 간단한 과정일 수도 있다. 그러나 여러 선택 중에 AMD를 모듈 포맷으로 사용하려고 한다면 알게 될 주요한 개념적인 차이점들이 있다:
 
-* As AMD isn't a standard native to JavaScript or the browser, it's necessary to use a script loader (such as RequireJS or curl.js) in order to support defining components and modules using this module format. As we've already reviewed, there are a number of advantages to using the AMD as well as RequireJS to assist here.
-* Models, views, controllers and routers need to be encapsulated *using* the AMD-format. This allows each component of our Backbone application to cleanly manage dependencies (e.g collections required by a view) in the same way that AMD allows non-Backbone modules to.
-* Non-Backbone components/modules (such as utilities or application helpers) can also be encapsulated using AMD. I encourage you to try developing these modules in such a way that they can both be used and tested independent of your Backbone code as this will increase their ability to be re-used elsewhere.
+* AMD가 자바스크립트나 브라우져의 표준적인 특성이 아니기 때문에, 모듈 포맷을 사용해서 컴포넌트와 모듈을 정의하도록 하기 위해서는 ( RequireJS나 curl.js와 같은 ) 스크립트 로더를 반드시 써야한다. 우리가 이미 봤다시피, 여기해서 AMD뿐만 아니라 RequireJS를 사용한 많은 장점들이 있다.
+* 모델, 뷰, 컨트롤러, 라우터는 AMD 형태를 *사용해서* 은닉화되어야만 한다. 이것은 Backbone 어플리케이션의 각 컴포넌트가 AMD가 Backbone이 아닌 모듈에 하듯이 깔끔하게 종속성( 예를 들면, 뷰는 컬렉션을 필요로 한다 )을 관리하게 해준다.
+* ( 유틸리티나 어플리케이션 헬퍼같은 ) Backbone이 아닌 컴포넌트나 모듈도 AMD를 사용해서 은닉될 수 있다. 나는 이것이 다른곳에서 재사용성을 증가시키기 때문에 당신이 Backbone 코드에 독립적으로 사용되기도 하고 테스트되기도 하는 방식으로 이들 모듈을 개발해보게 한다.
 
-Now that we've reviewed the basics, let's take a look at developing our application. For reference, the structure of our app is as follows:
+우리는 기본을 봤기 때문에, 어플리케이션 개발을 보자. 참고로 앱의 구조는 다음과 같다:
 
 ```
 index.html
@@ -7162,9 +7162,9 @@ index.html
 ...css/
 ```
 
-### Markup
+### 마크업
 
-The markup for the application is relatively simple and consists of three primary parts: an input section for entering new todo items (`create-todo`), a list section to display existing items (which can also be edited in-place) (`todo-list`) and finally a section summarizing how many items are left to be completed (`todo-stats`).
+어플리케이션의 마크업은 상대적으로 단순하고 세개의 주요 부분으로 구성된다: 새로운 할일 항목을 입력하는 입력부( `create-todo` ), ( 그자리에서 바로 편집도 할 수 있는 ) 이미 존재하는 항목들을 보여주는 목록부( `todo-list` ), 마지막으로 얼마나 많은 항목이 완료로 남아있는지 요약해주는 부분( `todo-stats` ).
 
 ```
 <div id="todoapp">
@@ -7187,15 +7187,15 @@ The markup for the application is relatively simple and consists of three primar
 </div>
 ```
 
-The rest of the tutorial will now focus on the JavaScript side of the practical.
+안내서의 나머지 부분은 실제의 자바스크립트 부분에 촛점을 맞출 것이다.
 
-### Configuration options
+### 설정 옵션
 
-If you've read the earlier chapter on AMD, you may have noticed that explicitly needing to define each dependency a Backbone module (view, collection or other module) may require with it can get a little tedious. This can however be improved.
+당신이 AMD에 관한 이전 챕터를 읽었다면, Backbone 모듈( 뷰, 컬렉션, 혹은 다른 모듈 )이 필요로 하는 각 의존성을  명시적으로 정의해야하기 때문에 조금은 지루할 수 있다. 그러나, 이것은 개선될 수 있다.
 
-In order to simplify referencing common paths the modules in our application may use, we use a RequireJS [configuration object](http://requirejs.org/docs/api.html#config), which is typically defined as a top-level script file. Configuration objects have a number of useful capabilities, the most useful being mode name-mapping. Name-maps are basically a key:value pair, where the key defines the alias you wish to use for a path and the value represents the true location of the path.
+단순히 어플리케이션의 모듈이 사용하는 공통 경로를 참조하기 위해서, 우리는 RequireJS [configuration object](http://requirejs.org/docs/api.html#config)를 사용한다. 그건은 일반적으로 최상위 스크립트 파일로 정의된다. 설정 객체는 많은 유용한 기능이 있는데, 가장 유용한 것은 이름 매핑이다. 이름 매핑은 기본적으로 키:값 쌍이다. 이때, 키는 경로에 대해 사용하고 싶은 축약이름이고, 값은 경로의 실제 위치를 나태낸다.
 
-In the code-sample below, you can see some typical examples of common name-maps which include: `backbone`, `underscore`, `jquery` and depending on your choice, the RequireJS `text` plugin, which assists with loading text assets like templates.
+아래 코드 예제에서, `backbone`, `underscore`, `jquery` 그리고 선택에 따라 텍스트 자산을 템플릿으로 로딩하도록 도와주는 RequireJS `text` 플러그인을 포함하는 공통 이름 매핑을 볼 수 있다.
 
 **main.js**
 
@@ -7215,27 +7215,27 @@ require(['views/app'], function(AppView){
 });
 ```
 
-The `require()` at the end of our main.js file is simply there so we can load and instantiate the primary view for our application (`views/app.js`). You'll commonly see both this and the configuration object included in most top-level script files for a project.
+main.js 파일의  끝에 있는 `require()`는 단순해서 우리는 어플리케이션( `view/app.js` )의 주 뷰를 로드해서 객체화할 수 있다. 우리는 보통 프로젝트 최상위 스크립트 파일에 포함된 이것과 설정 객체 모두를 보게될 것이다.
 
-In addition to offering name-mapping, the configuration object can be used to define additional properties such as `waitSeconds` - the number of seconds to wait before script loading times out and `locale`, should you wish to load up i18n bundles for custom languages. The `baseUrl` is simply the path to use for module lookups.
+이름 매핑을 제한할 뿐만 아니라, 설정 객체는 `waitSeconds`( 스크립트 로딩전에 기다리는 초 단위 시간 )같은 부수적인 특성을 정의하는데 사용될 수도 있다. 당신은 다른 언어에 대해서 국제화 번들을 로드하고 싶을 것이다. `baseUrl`은 단순히 모듈을 찾는데 사용되는 경로이다.
 
-For more information on configuration objects, please feel free to check out the excellent guide to them in the [RequireJS docs](http://requirejs.org/docs/api.html#config).
+설정 객체에 대한 더 많은 정보를 위해서는 [RequireJS 문서](http://requirejs.org/docs/api.html#config)에 있는 안내서를 자유로이 확인해봐라.
 
 
-### Modularizing our models, views and collections
+### 모델, 뷰, 컬렉션을 모듈화하기
 
-Before we dive into AMD-wrapped versions of our Backbone components, let's review a sample of a non-AMD view. The following view listens for changes to its model (a Todo item) and re-renders if a user edits the value of the item.
+우리가 Backbone 컴포넌트의 AMD로 싼 버젼에 들어가기 전에, AMD가 아닌 뷰의 예제를 살펴보자. 다음 뷰는 자신의 모델( Todo 항목 )의 변경을 감시해서 사용자가 항목의 값을 수정하면 다시 렌더링한다.
 
 ```javascript
 var TodoView = Backbone.View.extend({
 
-    //... is a list tag.
+    //... li 태그
     tagName:  'li',
 
-    // Cache the template function for a single item.
+    // 단일 항목에 대한 템플릿 함수를 캐쉬한다.
     template: _.template($('#item-template').html()),
 
-    // The DOM events specific to an item.
+    // 아이템에 지정된 DOM 이벤트.
     events: {
       'click .check'              : 'toggleDone',
       'dblclick div.todo-content' : 'edit',
@@ -7243,9 +7243,9 @@ var TodoView = Backbone.View.extend({
       'keypress .todo-input'      : 'updateOnEnter'
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
+    //  TodoView는 모델의 변경을 감시해서 다시 렌더링한다.
+    // 이 앱에서는 **Todo**와 **TodoView** 사이에 1:1 대응이 있기 때문에,
+    // 편의상 모델을 직접적으로 참조시킨다.
     initialize: function() {
       this.model.on('change', this.render, this);
       this.model.view = this;
@@ -7253,7 +7253,7 @@ var TodoView = Backbone.View.extend({
     ...
 ```
 
-Note how for templating the common practice of referencing a script by an ID (or other selector) and obtaining its value is used. This of course requires that the template being accessed is implicitly defined in our markup. The following is the 'embedded' version of our template being referenced above:
+ 템플릿팅에 대해서 어떻게 아이디( 혹은 다른 선택자 )로 스크립트를 참조하고 그 값을 얻는지에 대한 일반적인 방법이 사용되었다. 이번 코스는 접근되는 템플릿이 마크업 안에 암묵적으로 정의되어야만 한다. 다음은 위에서 참조되고 있는 템플릿의 '내장' 버젼이다:
 
 ```
 <script type="text/template" id="item-template">
@@ -7270,9 +7270,9 @@ Note how for templating the common practice of referencing a script by an ID (or
 </script>
 ```
 
-Whilst there is nothing wrong with the template itself, once we begin to develop larger applications requiring multiple templates, including them all in our markup on page-load can quickly become both unmanageable and come with performance costs. We'll look at solving this problem in a minute.
+템플릿에 아무런 이상이 없는 동안, 우리가 일단 여러 템플릿을 필요로 하는  큰 어플리케이션의 개발을 시작한다면, 템플릿 모두를 페이지 로드에 포함하는 것은 빠르게 관리하기도 어렵고 실행 비용도 늘어나게 된다. 우리는 잠깐동안 이 문제를 해결하는 것을 볼 것이다.
 
-Let's now take a look at the AMD-version of our view. As discussed earlier, the 'module' is wrapped using AMD's `define()` which allows us to specify the dependencies our view requires. Using the mapped paths to 'jquery' etc. simplifies referencing common dependencies and instances of dependencies are themselves mapped to local variables that we can access (e.g 'jquery' is mapped to `$`).
+이제 뷰의 AMD 버젼을 보자. 앞서 논의한대로, '모듈'은 AMD의 뷰가 필요로 하는 의존성을 지정하는 `define()`을 사용해서 감싸졌다. 'jquery' 등에 매핑된 경로를 사용하는 것은 공통 의존성을 참조하는 것을 단순화하고 의존성 객체는 우리가 접근할 수 있는 지역 변수( 예를 들어 'jquery'는 `$` )로 매핑된다.
 
 **views/todo.js**
 
@@ -7285,13 +7285,13 @@ define([
   ], function($, _, Backbone, todosTemplate){
   var TodoView = Backbone.View.extend({
 
-    //... is a list tag.
+    //... li 태그.
     tagName:  'li',
 
-    // Cache the template function for a single item.
+    // 단일 항목에 대한 템플릿 함수를 캐쉬한다.
     template: _.template(todosTemplate),
 
-    // The DOM events specific to an item.
+     // 아이템에 지정된 DOM 이벤트.
     events: {
       'click .check'              : 'toggleDone',
       'dblclick div.todo-content' : 'edit',
@@ -7299,22 +7299,22 @@ define([
       'keypress .todo-input'      : 'updateOnEnter'
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
+    //  TodoView는 모델의 변경을 감시해서 다시 렌더링한다.
+    // 이 앱에서는 **Todo**와 **TodoView** 사이에 1:1 대응이 있기 때문에,
+    // 편의상 모델을 직접적으로 참조시킨다.
     initialize: function() {
       this.model.on('change', this.render, this);
       this.model.view = this;
     },
 
-    // Re-render the contents of the todo item.
+    // 할일 항목의 내용을 다시 렌더링한다.
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
       this.setContent();
       return this;
     },
 
-    // Use `jQuery.text` to set the contents of the todo item.
+    // 할일 항목의 내용을 설정하기 위해서 `jQuery.text`를 사용한다.
     setContent: function() {
       var content = this.model.get('content');
       this.$('.todo-content').text(content);
@@ -7325,9 +7325,9 @@ define([
     ...
 ```
 
- From a maintenance perspective, there's nothing logically different in this version of our view, except for how we approach templating.
+유지보수 관점에서, 펨플릿에 접근하는 것만 제외하면, 뷰에서 차이점은 없다.
 
-Using the RequireJS text plugin (the dependency marked `text`), we can actually store all of the contents for the template we looked at earlier in an external file (todos.html).
+( 의존성은 `text`로 표시된는 ) RequireJS의 텍스트 플러그인을 사용해서 우리는 실체로 이전에 외부 파일( todos.html )에서 본 템플릿의 모든 내용을 저장할 수 있다.
 
 **templates/todos.html**
 
@@ -7344,9 +7344,9 @@ Using the RequireJS text plugin (the dependency marked `text`), we can actually 
 </div>
 ```
 
-There's no longer a need to be concerned with IDs for the template as we can map its contents to a local variable (in this case `todosTemplate`). We then simply pass this to the Underscore.js templating function `_.template()` the same way we normally would have the value of our template script.
+템플릿의 내용을 지역변수( 이경우 `todosTemplate` )로 매핑할 수 있기 때문에 더이상 템플릿의 아이디에 관심가질 필요가 없다. 그리고나서 우리가 보통 템플릿 스크립트의 값을 얻은 방식대로 그것을 Underscore.js의 템플릿팅 함수인 `_.template()`에 전달한다.
 
-Next, let's look at how to define models as dependencies which can be pulled into collections. Here's an AMD-compatible model module, which has two default values: a `content` attribute for the content of a Todo item and a boolean `done` state, allowing us to trigger whether the item has been completed or not.
+다음으로, 어떻게 모델을 컬렉션에서 필요로 하는 의존성으로 정의하는지 보자. 여기 AMD 호환가능한 모델 모듈이 있는데, 그것은 두개의 기본값을 갖는다: Todo 항목의 내용을 위한 `content` 속성과 항목이 완료되었는지 아닌지를 알게해주는 `done` 상태값.
 
 **models/todo.js**
 
@@ -7354,9 +7354,9 @@ Next, let's look at how to define models as dependencies which can be pulled int
 define(['underscore', 'backbone'], function(_, Backbone) {
   var TodoModel = Backbone.Model.extend({
 
-    // Default attributes for the todo.
+    // 할일에 대한 기본값.
     defaults: {
-      // Ensure that each todo created has `content`.
+      // 각 항목은 `content`를 가져야만 한다.
       content: 'empty todo...',
       done: false
     },
@@ -7364,12 +7364,12 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     initialize: function() {
     },
 
-    // Toggle the `done` state of this todo item.
+    // 이 할일 항목의 `done` 상태를 전환한다.
     toggle: function() {
       this.save({done: !this.get('done')});
     },
 
-    // Remove this Todo from *localStorage* and delete its view.
+    // *localStorage*에서 제거하고 그 뷰도 삭제한다.
     clear: function() {
       this.destroy();
       this.view.remove();
@@ -7380,7 +7380,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 });
 ```
 
-As per other types of dependencies, we can easily map our model module to a local variable (in this case `Todo`) so it can be referenced as the model to use for our `TodosCollection`. This collection also supports a simple `done()` filter for narrowing down Todo items that have been completed and a `remaining()` filter for those that are still outstanding.
+다른 종류의 의존성마다 우리가 우리 모델 모듈을 지역변수( 이경우 `Todo` )로 쉽게 매핑할 수 있기 때문에 `TodosCollection`을 위해 사용하는 모델로 참조될 수 있다. 이 컬렉션도 완료된 Todo 항목들만 걸러주는 `done()` 필터와 완료되지 않은 항목들을 위한 `remaining()` 필터를 간단하기 지원한다.
 
 **collections/todos.js**
 
@@ -7394,25 +7394,25 @@ define([
 
     var TodosCollection = Backbone.Collection.extend({
 
-    // Reference to this collection's model.
+    // 이 컬렌션의 모델에 대한 참조
     model: Todo,
 
-    // Save all of the todo items under the `todos` namespace.
+    // `todo` 이름 공간 내에 모든 할일 항목을 저장한다.
     localStorage: new Store('todos'),
 
-    // Filter down the list of all todo items that are finished.
+    // 완료된 모든 할일 항목들만 필터링한다.
     done: function() {
       return this.filter(function(todo){ return todo.get('done'); });
     },
 
-    // Filter down the list to only todo items that are still not finished.
+    // 완료되지 않은 할일 항목들만 필트링한다.
     remaining: function() {
       return this.without.apply(this, this.done());
     },
     ...
 ```
 
-In addition to allowing users to add new Todo items from views (which we then insert as models in a collection), we ideally also want to be able to display how many items have been completed and how many are remaining. We've already defined filters that can provide us this information in the above collection, so let's use them in our main application view.
+사용자가 ( 컬렉션의 모델들로 삽입한 ) 뷰의 새로운 할일 목록을 추가하는 것뿐만 아니라, 이상적으로 얼마나 많은 항목들이 완료되고 얼마나 많은 항목들이 남아있는지 보여주길 원한다. 우리는 이미 위의 컬렉션에 이정보를 제공하는 필터를 정의했기 때문에 주 어플리케이션 뷰에서 그 정보를 이용해보자.
 
 **views/app.js**
 
@@ -7428,17 +7428,17 @@ define([
 
   var AppView = Backbone.View.extend({
 
-    // Instead of generating a new element, bind to the existing skeleton of
-    // the App already present in the HTML.
+    // 새로운 요수를 생성하는 대신에 HTML에 표시되어 있는
+    // 이미 있는 App의 골력에 바인딩한다.
     el: $('#todoapp'),
 
-    // Our template for the line of statistics at the bottom of the app.
+    // 앱의 바닥에 통계줄을 위한 템플릿
     statsTemplate: _.template(statsTemplate),
 
-    // ...events, initialize() etc. can be seen in the complete file
+    // ...이벤트, initialize()등은 전체 파일에서 볼 수 있다.
 
-    // Re-rendering the App just means refreshing the statistics -- the rest
-    // of the app doesn't change.
+    // 앱을 재 렌더링하는 것은 단지 통계부분만 갱신한다 - 앱의
+    // 나머지는 변하지 않는다.
     render: function() {
       var done = Todos.done().length;
       this.$('#todo-stats').html(this.statsTemplate({
@@ -7450,9 +7450,9 @@ define([
     ...
 ```
 
-Above, we map the second template for this project, `templates/stats.html` to `statsTemplate` which is used for rendering the overall `done` and `remaining` states. This works by simply passing our template the length of our overall Todos collection (`Todos.length` - the number of Todo items created so far) and similarly the length (counts) for items that have been completed (`Todos.done().length`) or are remaining (`Todos.remaining().length`).
+위에서, 우리는 이 프로젝트를 위한 두번째 템플릿으로 `templates/stats.html`을 `statsTemplate`에 매핑한다, 그것은 전체의 `done`과 `remaingin` 상태를 렌더링하는데 사용된다. 이겄은 단순히 템플릿에 전체의 Todos 컬렉션의 길이( `Todos.length` - 지금까지 생성된 Todo 항목의 수 )와 완료된 항목의 수( `Todos.done().length` )와 남은 항목의 수( `Todos.remaining().length )를 전달해서 동작한다.
 
-The contents of our `statsTemplate` can be seen below. It's nothing too complicated, but does use ternary conditions to evaluate whether we should state there's "1 item" or "2 item<i>s</i>" in a particular state.
+`statsTemplate`의 내용은 아래에서 볼 수 있다. 그리 복잡할 것은 없지만, 특정 상태에 "1 item"이나 "2 item<i>s</i>"이 있다고 기술해야 하는지 계산하는 삼항 조건식을 사용한다.
 
 ```
 <% if (total) { %>
@@ -7473,22 +7473,22 @@ The contents of our `statsTemplate` can be seen below. It's nothing too complica
 
 
 
-The rest of the source for the Todo app mainly consists of code for handling user and application events, but that rounds up most of the core concepts for this practical.
+할일 앱에 대한 나머지 소스는 주로 사용자와 어플리케이션의 이벤트를 처리하는 코드로 구성되어 있지만, 이 예제에 대한 핵심 개념의 대부분은 살펴보았다.
 
-To see how everything ties together, feel free to grab the source by cloning this repo or browse it [online](https://github.com/addyosmani/backbone-fundamentals/tree/master/practicals/modular-todo-app) to learn more. I hope you find it helpful!.
+전체가 어떻게 묶이는지 보기 위해서는 자유롭게 이 저장소를 클론해서 소스를 가져가고 더 배우기 위해서 [온라인](https://github.com/addyosmani/backbone-fundamentals/tree/master/practicals/modular-todo-app)을 돌아다녀 보아라. 도움이 되길 바란다!
 
-**Note:** While this first practical doesn't use a build profile as outlined in the chapter on using the RequireJS optimizer, we will be using one in the section on building mobile Backbone applications.
+**주의:** 이 첫번째 예제가 RequireJS 최적화기에 대한 챕터에서 본 빌드 프로파일을 사용하지 않는 반면 모바일 Backbone 어플리케이션을 개발하는 섹션에서는 사용할 것이다.
 
 
-## Route based module loading
+## 모듈 로딩에 기반한 라우터
 
-This section will discuss a route based approach to module loading as implemented in [Lumbar](http://walmartlabs.github.com/lumbar) by Kevin Decker. Like RequireJS, Lumbar is also a modular build system, but the pattern it implements for loading routes may be used with any build system.
+이번 섹션은 Kevin Decker이 만든 [Lumbar](http://walmartlabs.github.com/lumbar)에 구현된 대로 모듈 로딩의 접근법에 기반한 지점에 대해 논의할 것이다. RequireJS와 같이 Lumbar도 모듈화된 빌드 시스템이지만 로딩 지점에 대해 구현한 패턴은 어떤 빌드 시스템에서도 사용할 수 있다.
 
-The specifics of the Lumbar build tool are not discussed in this book. To see a complete Lumbar based project with the loader and build system see [Thorax](http://walmartlabs.github.com/thorax) which provides boilerplate projects for various environments including Lumbar.
+Lumbar 빌드 툴의 기능 명세는 이 책에서 논의되지 않을 것이다. 로더와 빌드 시스템으로 완전한 Lumbar 기반의 프로젝트를 보기 위해서는 Lumbar를 포함한 다양한 환경에 대한 보일러플레이트 프로젝트를 제공하는 [Thorax](http://walmartlabs.github.com/thorax)를 보아라.
 
-### JSON based module configuration
+### JSON 기반 모듈 설정
 
-RequireJS defines dependencies per file, while Lumbar defines a list of files for each module in a central JSON configuration file, outputting a single JavaScript file for each defined module. Lumbar requires that each module (except the base module) define a single router and a list of routes. An example file might look like:
+Lumbar는 각 정의된 모듈에 대해서 하나의 자바스크립트 파일을 만들기 위해 중앙의 JSON 설정 파일에서 각 모듈에 대한 파일 목록을 정의하는 반면, RequireJS는 파일당 의존성을 정의한다. Lumbar는 기본 모듈을 제외한 각 모듈이 단일 라우터와 지점의 목록을 정의할 것을 필요로 한다. 예제 파일은 다음과 같다:
 
      {
         "modules": {
@@ -7513,7 +7513,7 @@ RequireJS defines dependencies per file, while Lumbar defines a list of files fo
         }
     }
 
-Every JavaScript file defined in a module will have a `module` object in scope which contains the `name` and `routes` for the module. In `js/routers/pages.js` we could define a Backbone router for our `pages` module like so:
+모듈에 정의된 모든 자바스크립트 파일은 모듈을 위한 `name`과 `routes`를 포함하고 있는 범위의 `모듈` 객체를 가질 것이다. `js/routers/pages.js`에 `pages` 모듈에 대한 Backbone 라우터를 다음과 같이 정의한다:
 
     new (Backbone.Router.extend({
         routes: module.routes,
@@ -7521,52 +7521,52 @@ Every JavaScript file defined in a module will have a `module` object in scope w
         contact: function() {}
     }));
 
-### Module loader Router
+### 모듈 로더 라우터
 
-A little used feature of `Backbone.Router` is it's ability to create multiple routers that listen to the same set of routes. Lumbar uses this feature to create a router that listens to all routes in the application. When a route is matched, this master router checks to see if the needed module is loaded. If the module is already loaded, then the master router takes no action and the router defined by the module will handle the route. If the needed module has not yet been loaded, it will be loaded, then `Backbone.history.loadUrl` will be called. This reloads the route, causes the master router to take no further action and the router defined in the freshly loaded module to respond.
+`Backbone.Router`의 가끔 사용되는 특징은 동일 지점들을 감시하는 다수의 라우터를 생성하는 기능이다. Lumbar는 어플리케이션의 모든 지점을 감시하는 라우터를 생성하는 이 특징을 사용한다. 지점이 일치할 때, 이 주 라우터는 필요한 모듈이 로드되었는지 아닌지를 체크한다. 모듈이 이미 로드되었으면, 주 라우터는 아무런 동작도 취하지않고 모듈에 정의된 라우터가 지점을 제어한다. 필요한 모듈이 아직 로드되어 있지 않았으면 로드하고 나서 `Backbone.history.loadUrl`이 호출될 것이다. 이것은 지점을 다시 로드하고, 주 라우터가 더 이상 동작하지 않게 만들고, 라우터는 응답하는 새로 로드된 모듈에 정의된다.
 
-A sample implementation is provided below. The `config` object would need to contain the data from our sample configuration JSON file above, and the `loader` object would need to implement `isLoaded` and `loadModule` methods. Note that Lumbar provides all of these implementations, the examples are provided to create your own implementation.
+예제 구현은 아래에 제공된다. `설정` 객체는 위의 예제 설정 JSON 파일의 데이타를 포함해야만 하고, `loader` 객체는 `isLoaded`와 `loadModule` 메쏘드를 구현해야만 한다. Lumbar는 이들 구현 모두를 지공하고 있는 것을 기억하라. 예제는 자체적인 구현을 만들기 위해서 제공된다.
 
-    // Create an object that will be used as the prototype
-    // for our master router
+    // 주 라우터를 위한 프로토타입으로 
+    // 사용되는 객체를 생성한다.
     var handlers = {
         routes: {}
     };
 
     _.each(config.modules, function(module, moduleName) {
         if (module.routes) {
-            // Generate a loading callback for the module
+            // 모듈을 위한 로딩 콜백을 생성한다
             var callbackName = "loader_" moduleName;
             handlers[callbackName] = function() {
                 if (loader.isLoaded(moduleName)) {
-                    // Do nothing if the module is loaded
+                    // 모듈이 로드된다면 아무것도 하지 않는다
                     return;
                 } else {
-                    //the module needs to be loaded
+                    // 모듈은 로드되어야만 한다
                     loader.loadModule(moduleName, function() {
-                        // Module is loaded, reloading the route
-                        // will trigger callback in the module's
-                        // router
+                        // 라우터를 리로딩하는 것이
+			// 모듈의 라우터의 콜백을
+			// 구동하기 위해 모듈이 로드된다.
                         Backbone.history.loadUrl();
                     });
                 }
             };
-            // Each route in the module should trigger the
-            // loading callback
+            // 모듈의 각 지점은 로딩 콜백을 
+	    // 구동해야만 한다.
             _.each(module.routes, function(methodName, route) {
                 handlers.routes[route] = callbackName;
             });
         }
     });
 
-    // Create the master router
+    // 주 라우터를 생성한다
     new (Backbone.Router.extend(handlers));
 
-### Using NodeJS to handle pushState
+### pushState를 제어하기 위한 Node의 사용
 
-`window.history.pushState` support (serving Backbone routes without a hashtag) requires that the server be aware of what URLs your Backbone application will handle, since the user should be able to enter the app at any of those routes (or hit reload after navigating to a pushState URL).
+사용자가 지점들 중에 어디에선든 앱을 진입할( 혹은 pushState URL로 이동후 리프레쉬를 누를 ) 수 있기 때문에, ( 해쉬 태그없이 Backbone 지점을 제공해주는 ) `window.history.pushState` 지원은 서버가 Backbone 어플리케이션이 다루는 URL이 무엇인 알아야만 한다.
 
-Another advantage to defining all routes in a single location is that the same JSON configuration file provided above could be loaded by the server, listening to each route. A sample implementation in NodeJS and Express:
+단일 위치에 모든 지점을 정의하는 다른 잇점은 각 지점을 감시하기 위해 위에서 제공되는 같은 JSON 설정 파일이 서버에서 로드될 수도 있다는 것이다. NodeJS와 Express에서의 예제 구현:
 
     var fs = require('fs'),
         _ = require('underscore'),
@@ -7584,7 +7584,7 @@ Another advantage to defining all routes in a single location is that the same J
         }
     });
 
-This assumes that index.html will be serving out your Backbone application. The `Backbone.History` object can handle the rest of the routing logic as long as a `root` option is specified. A sample configuration for a simple application that lives at the root might look like:
+이것은 index.html이 Backbone 어플리케이션을 제공할 것이라고 가정한다. `Backbone.History` 객체는 `root` 설정이 지정되는 한 나머지 지점을 처리할 수 있다. 루트에 있는 간단한 어플리케이션을 위한 예제 설정은 다음과 같다:
 
     Backbone.history || (Backbone.history = new Backbone.History());
     Backbone.history.start({
@@ -7592,49 +7592,49 @@ This assumes that index.html will be serving out your Backbone application. The 
       root: '/'
     });
 
-## Decoupling Backbone with the Mediator and Facade Patterns
+## 중개자와 퍼사드 패턴으로 Bacbone을 분리하기
 
-In this section we'll discuss applying some of the concepts I cover in my article on [Large-scale JavaScript Application development](http://addyosmani.com/largescalejavascript) to Backbone.
+이 섹션에서 우리는 [대규모 자바스크립트 어플리케이션 개발](http://addyosmani.com/largescalejavascript)의 내 글에서 다룬 어떤 개념을 Backbone에 적용할 것이다.
 
-*After, you may be interested in taking a look At [Aura](http://github.com/addyosmani/aura) - my popular widget-based Backbone.js extension framework based on many of the concepts we will be covering in this section.*
+*나중에, 당신은 [Aura](http://github.com/addyosmani/aura) 를 한번 보고 싶어할 지 모르겠다 - 이번 섹션에서 다룰 많은 개념에 기반한 내가 만든 인기 있는 위젯 기반의 Backbone.js 확장 프레임워크.*
 
-### Summary
+### 요약
 
-At a high-level, one architecture that works for such applications is something which is:
+상위 수준에서 보면, 그런 어플리케이션에서 동작하는 구조는 다음 중에 하나이다:
 
-* **Highly decoupled**: encouraging modules to only publish and subscribe to events of interest rather than directly communicating with each other. This helps us to build applications who's units of code aren't highly tied (coupled) together and can thus be reused more easily.
-* **Supports module-level security**: whereby modules are only able to execute behavior they've been permitted to. Application security is an area which is often overlooked in JavaScript applications, but can be quite easily implemented in a flexible manner.
-* **Supports failover**: allowing an application continuing to function even if particular modules fail. The typical example I give of this is the GMail chat widget. Imagine being able to build applications in a way that if one widget on the page fails (e.g chat), the rest of your application (mail) can continue to function without being affected.
+* **매우 낮은 의존성**: 모듈들이 서로 직접 통신하는 것보다 관심있는 이벤트를 발행하고 구독만 하게 한다. 이것은 우리가 어떤 코드 조각도 강하게 서로 묶이지 않고 더 쉽게 재사용될 수 있는 어플리케이션을 만들게 도와준다.
+* **모듈 단위 보안의 지원**: 그것으로 모듈은 허용된 동작만을 실행할 수 있다. 어플리케이션 보안은 자바스크립트 어플리케이션에서 종종 간과되지만, 유연한 방법으로 매우 쉽게 구현되는 영역이다.
+* **실패 극복 지원**: 특정 모듈이 에러가 나더라도 어플리케이션이 계속 동작하게 해준다. 내가 제시하는 이에 대한 전형적인 예제는 GMail 채팅 위젯이다. 페이지상의 한 위젯( 예를 들어 채팅 )이 에러가 나면 어플리케이션의 나머지( 메일 )가 영향받지 않고 계속 동작하는 방식으로 어플리케이션을 만들 수 있다고 상상해봐라.
 
-This is an architecture which has been implemented by a number of different companies in the past, including Yahoo! (for their modularized homepage.
+이것은 과거에 ( 모듈화된 홈페이지를 위해서 ) Yahoo!를 포함해서 많은 다른 회사들에 의해 구현된 구조이다.
 
-The three design patterns that make this architecture possible are the:
+이 구조를 가능하게 하는 세개의 설계 패턴은:
 
-* **Module pattern**: used for encapsulating unique blocks of code, where functions and variables can be kept either public or private. ('private' in the simulation of privacy sense, as of course don't have true privacy in JavaScript)
-* **Mediator pattern**: used when the communication between modules may be complex, but is still well defined. If it appears a system may have too many relationships between modules in your code, it may be time to have a central point of control, which is where the pattern fits in.
-* **Facade pattern**: used for providing a convenient higher-level interface to a larger body of code, hiding its true underlying complexity
+* **모듈 패턴**: 함수와 변수가 공개나 비공개로 유지할 수 있는 곳의 특정 코드 블럭을 은닉하는데 사용된다( 물론 자바스크립트에서 'private'은 진짜 보호는 아니기 때문에 보호를 흉내낸다 )
+* **중개자 패턴**: 모듈들 간의 통신이 복잡하지만 잘 정의될 때, 사용된다. 시스템이 코드상의 모듈간에 너무 많은 관계를 가지면, 제어의 중앙집중점을 가지는데 시간이 걸리기도 한다. 그건은 패턴이 잘 맞는 상황이다
+* **퍼사드 패턴**: 많은 량의 코드에 실제 내부의 복잡성을 숨기고 편리한 상위 레벨 인터페이스를 제공하는데 사용된다
 
-Their specific roles in this architecture can be found below.
+이 구조에는 다음의 역할이 있다.
 
-* **Modules**: There are almost two concepts of what defines a module. As AMD is being used as a module wrapper, technically each model, view and collection can be considered a module. We then have the concept of modules being distinct blocks of code outside of just MVC/MV*. For the latter, these types of 'modules' are primarily concerned with broadcasting and subscribing to events of interest rather than directly communicating with each other.They are made possible through the Mediator pattern.
-* **Mediator**: The mediator has a varying role depending on just how you wish to implement it. In my article, I mention using it as a module manager with the ability to start and stop modules at will, however when it comes to Backbone, I feel that simplifying it down to the role of a central 'controller' that provides pub/sub capabilities should suffice. One can of course go all out in terms of building a module system that supports module starting, stopping, pausing etc, however the scope of this is outside of this chapter.
-* **Facade**: This acts as a secure middle-layer that both abstracts an application core (Mediator) and relays messages from the modules back to the Mediator so they don't touch it directly. The Facade also performs the duty of application security guard; it checks event notifications from modules against a configuration (permissions.js, which we will look at later) to ensure requests from modules are only processed if they are permitted to execute the behavior passed.
-
-
-### Exercise
-
-For the practical section of this chapter, we'll be extending the well-known Backbone Todo application using the three patterns mentioned above.
-
-The application is broken down into AMD modules that cover everything from Backbone models through to application-level modules. The views publish events of interest to the rest of the application and modules can then subscribe to these event notifications.
-
-All subscriptions from modules go through a facade (or sandbox). What this does is check against the subscriber name and the 'channel/notification' it's attempting to subscribe to. If a channel *doesn't* have permissions to be subscribed to (something established through permissions.js), the subscription isn't permitted.
+* **모듈**: 모듈을 정의하는 것에 대한 대략 두 개의 개념이 있다. AMD 모듈을 감싸는 역할로 사용되기 때문에, 기술적으로 각 모델, 뷰, 컬렉션이 모듈로 간주될 수 있다. 우리는 단지 MVC나 MV*의 외부에 구분되는 코드 블럭이 되는 모듈 개념을 가지고 있다. 나중에 이런 종류의 '모듈'은 서로 간에 직접 통신하기 보다는 발행과 구독으로만 다뤄진다. 그것은 중개자 패턴을 통해 가능해진다.
+* **중개자**: 중개자는 당신이 구현하고 싶은 방식에 따라 다양한 역할을 하게 된다. 내가 쓴 글에서, 중개자를 마음대로 모듈을 시작하고 끝내는 기능을 가진 모듈 관리자로 사용하는 것을 언급했었지만 그것이 Backbone으로 오면 발행/구독 기능을 제공하는 중앙의 '컨트롤러'로 단순화하는 것으로 충분하다고 느껴진다. 물론 모듈 시작, 정지, 잠시 멈춤 등을 지원하는 모듈 시스템을 만드는 관점에서 모든 노력을 다하지만, 이 범위는 본 챕터의 것이 아니다.
+* **퍼사드**: 이것은 어플리케이션 코어( 중개자 )를 추상화하면서 모듈이 중개자에 다시 메시지를 중계하는 안전한 중간 계층으로 동작해서, 모듈 간에 직접적으로 접촉하지 않는다. 퍼사드는 어플리케이션 보안 경비의 역할도 수행한다: 전달된 행동을 실행하도록 해주면 모듈의 요청이 처리되도록 설정( permissions.js, 나중에 살펴볼 것이다. )으로 모듈에서의 이벤트 통지를 확인한다.
 
 
-**Mediator**
+### 연습
 
-Found in `aura/mediator.js`
+이 챕터의 연습 섹셕을 위해, 우리는 위에서 언급한 세가지 패턴을 사용해서 잘 알고 있는 Backbone 할일 어플리케이션을 확장할 것이다.
 
-Below is a very simple AMD-wrapped implementation of the mediator pattern, based on prior work by Ryan Florence. It accepts as its input an object, to which it attaches `publish()` and `subscribe()` methods. In a larger application, the mediator can contain additional utilities, such as handlers for initializing, starting and stopping modules, but for demonstration purposes, these two methods should work fine for our needs.
+어플리케이션은 어플리케이션 수준의 모듈을 통해 Backbone 모델의 모든 것을 다루는 AMD 모듈로 쪼개진다. 뷰는 어플리케이션의 나머지에 관련된 이벤트를 발행하고, 그리고나서 모듈은 이 이벤트 통지를 구독할 수 있을 것이다.
+
+모듈의 구독은 퍼사드( 혹은 샌드박스 )를 통해 수행된다. 이것이 하는 일은 구독자 이름과 구독하려는 'channel/notification' 을 대조하는 것이다. 채널이 ( permissions.js를 통해 지정된 것에) 구독을 허용하지 *않으면*, 구독은 허용되지 않는다.
+
+
+**중개자**
+
+`aura/mediator.js`에 나타난다.
+
+아래는 Ryan Florence가 이전에 작업한 것에 기초한 중개자 패턴의 아주 간단한 AMD 로 감싼 구현이다. 그것은 객체의 입력으로 받아들여지는데, `publish()`와 `subscribe()` 메쏘드를 붙인다. 큰 어플리케이션에서 중개자는 모듈 초기화, 구동, 정지를 위한 처리자같은 추가적인 유틸리티를 포함할 수 있지만, 데모를 목적으로 우리 요건을 위해서 이 두개의 메쏘드만 잘 동작하면 된다.
 
 ```javascript
 define([], function(obj){
@@ -7661,11 +7661,11 @@ define([], function(obj){
 ```
 
 
-**Facade**
+**퍼사드**
 
-Found in `aura/facade.js`
+`aura/facade.js`에 나타난다.
 
-Next, we have an implementation of the facade pattern. Now the classical facade pattern applied to JavaScript would probably look a little like this:
+다음으로 퍼사드 패턴의 구현이다. 이제 자바스크립트에 적용된 고전적인 퍼사드 패턴은 다음과 같이 보일 것이다:
 
 ```javascript
 
@@ -7697,14 +7697,14 @@ var module = (function() {
 }());
 
 module.facade({run: true, val:10});
-//outputs current value: 10, running
+// 출력 current value: 10, running
 ```
 
-It's effectively a variation of the module pattern, where instead of simply returning an interface of supported methods, your API can completely hide the true implementation powering it, returning something simpler. This allows the logic being performed in the background to be as complex as necessary, whilst all the end-user experiences is a simplified API they pass options to (note how in our case, a single method abstraction is exposed). This is a beautiful way of providing APIs that can be easily consumed.
+지원 메쏘드의 인터페이스를 단순히 반환하는 대신에 API가 더 단순한 것을 반환하면서 동일한 동작의 실제 구현을 완전히 숨길 수 있는 상황에서 그것은 효과적인 모듈 패턴의 변형이다. 이것은 최종 사용자가 경험하는 것은 설정을 전달하는 단순화된 API( 우리의 경우, 단한나의 메쏘드 추상화가 노출되었다 )가 전부인 반면, 뒤에서 수행되는 로직이 필요한 만큼 복잡해지게 한다. 이것이 쉽게 사용할 수 있는 API를 제공하는 아름다운 방법이다.
 
-That said, to keep things simple, our implementation of an AMD-compatible facade will act a little more like a proxy. Modules will communicate directly through the facade to access the mediator's `publish()` and `subscribe()` methods, however, they won't as such touch the mediator directly.This enables the facade to provide application-level validation of any subscriptions and publications made.
+즉, 단순화하기 위해서 AMD 호환되는 퍼사드 구현은 프록시와 더 유사하게 동작할 것이다. 모듈은 중개자의 `publicsh()`와 `subscribe()` 메쏘드를 접근하여 퍼사드를 통해 직접 통신하겠지만, 중개자를 직접 건드리지는 못한다. 이것은 퍼사드가 어플리케이션 수준에서 구독과 발행의 검증을 하게 해준다.
 
-It also allows us to implement a simple, but flexible, permissions checker (as seen below) which will validate subscriptions made against a permissions configuration to see whether it's permitted or not.
+우리가 ( 아래에서 보듯이 ) 허용되었는지 아닌지를 알기 위해 권한 설정을 통해 구동을 검증하는 단순하지만 유연한 권한 검증기를 구현하도록 하게도 해준다.
 
 
 ```javascript
@@ -7714,9 +7714,9 @@ define([ '../aura/mediator' , '../aura/permissions' ], function (mediator, permi
 
     facade.subscribe = function(subscriber, channel, callback){
 
-        // Note: Handling permissions/security is optional here
-        // The permissions check can be removed
-        // to just use the mediator directly.
+        // 주의: 권한 및 안전을 제어하는 것은 여기에서 부수적인 것이다
+        // 중개자를 직접 사용하기 위해서만
+	// 권한 체크는 제거될 수 있다.
 
         if(permissions.validate(subscriber, channel)){
             mediator.subscribe( channel, callback );
@@ -7731,25 +7731,25 @@ define([ '../aura/mediator' , '../aura/permissions' ], function (mediator, permi
 });
 ```
 
-**Permissions**
+**권한**
 
-Found in `aura/permissions.js`
+`aura/permissions.js`에 나타난다.
 
-In our simple permissions configuration, we support checking against subscription requests to establish whether they are allowed to clear. This enforces a flexible security layer for the application.
+우리의 간단한 권한 설정에서, 우리는 명확한지 아닌지 만들어낸 구독 요청을 비교하도록 한다. 이것은 어플리케이션을 위한 유연한 보안 계층을 적용한다.
 
-To visually see how this works, consider changing say, permissions -> renderDone -> todoCounter to be false. This will completely disable the application from from rendering or displaying the counts component for Todo items left (because they aren't allowed to subscribe to that event notification). The rest of the Todo app can still however be used without issue.
+이것이 어떻게 동작하는지 가시적으로 보기 위해서, permissions -> renderDone -> todoCounter를 false가 되도록 변경하는 것을 생각해보자. 이것은 ( 그 이벤트 통지를 구독하지 않도록 하기 때문에 ) 어플리케이션이 남겨진 할일 항목들을 위한 카운트 컴포넌트를 렌더링하거나 보여주는 기능을 완전히 비활성화할 것이다. 하지만 할일 앱의 나머지 부분은 여전히 문제없이 사용된다.
 
-It's a very dumbed down example of the potential for application security, but imagine how powerful this might be in a large app with a significant number of visual widgets.
+그것은 어플리케이션 보안을 위해 매운 무건은 예제이지만, 많은 가시적인 위젯을 가진 큰 앱에서 얼마나 강력한지 상상해보라.
 
 ```javascript
 define([], function () {
 
-    // Permissions
+    // 권한
 
-    // A permissions structure can support checking
-    // against subscriptions prior to allowing them
-    // to clear. This enforces a flexible security
-    // layer for your application.
+    // 권한 구조는 그것이 명확하게 되기
+    // 이전에 구독을 비교한다. 이것은
+    // 어플리케이션을 위한 유연한
+    // 보안을 적용한다.
 
     var permissions = {
 
@@ -7799,29 +7799,29 @@ define([], function () {
 
 
 
-**Subscribers**
+**구독자**
 
-Found in `subscribers.js`
+`subscribers.js`에 나타난다.
 
-Subscriber 'modules' communicate through the facade back to the mediator and perform actions when a notification event of a particular name is published.
+구독자 '모듈'은 퍼사드를 통해 중개자에와 다시 통신하고 특정 이름의 이벤트가 발행될 때 동작을 수행한다.
 
-For example, when a user enters in a new piece of text for a Todo item and hits 'enter' the application publishes a notification saying two things: a) a new Todo item is available and b) the text content of the new item is X. It's then left up to the rest of the application to do with this information whatever it wishes.
+예를들어, 사용자가 할일 항목을 위해 몇개의 텍스트를 입력하고 '엔터'를 누를 때, 어플리케이션은 두가지를 말하는 통지를 발행한다: a) 새로운 할일 항목이 사용 가능하고 b) 새로운 항목의 텍스트 내용은 X이다.  원하는 것 무엇이든 이 정보로 하는 것은 어플리케이션의 나머지에 남겨진 것이다.
 
-In order to update your Backbone application to primarily use pub/sub, a lot of the work you may end up doing will be moving logic coupled inside of specific views to modules outside of it which are reactionary.
+주로 발행/구독을 사용하는 Backbone 어플리케이션을 갱신하기 위해서 당신이 결국 해야 하는 많은 작업은 특정 뷰내의 의존성 높은 로직을 반응하는 뷰 외부의 모듈로 옮기는 것이다.
 
-Take the `todoSaver` for example - its responsibility is saving new Todo items to models once the a `notificationName` called 'newContentAvailable' has fired. If you take a look at the permissions structure in the last code sample, you'll notice that 'newContentAvailable' is present there. If I wanted to prevent subscribers from being able to subscribe to this notification, I simply set it to a boolean value of `false`.
+예제로 `todoSaver`를 봐라 - 그 기능은 'newContentAvailable'이라고 불리는 `notificationName`이 구동되면 새로운 할일 항목을 모델에 저장하는 것이다. 당신이 마지막 예제 코드에서 권한 구조를 보았다면, 'newContentAvailable'이 거기 있다는 것을 알아챘을 것이다. 내가 구독자가 통지를 구독하는 것을 막고 싶으면, 단순히 설정값을 `false`로 지정한다.
 
-Again, this is a massive oversimplification of how advanced your permissions structures could get, but it's certainly one way of controlling what parts of your application can or can't be accessed by specific modules at any time.
+다시, 이것은 권한 구조를 얼마나 진보시키는가에 대한 엄청난 단순화이지만, 어플리케이션의 어떤 부분이 언제라도 특정 모듈에 의해 접근될 수 있게 하거나 막는 것을 제어하는 확실한 방법중 하나이다.
 
 ```javascript
 define(['jquery', 'underscore', 'aura/facade'],
 function ($, _, facade) {
 
-    // Subscription 'modules' for our views. These take the
-    // the form facade.subscribe( subscriberName, notificationName , callBack )
+    // 뷰에 대한 구독 '모듈'. 이것들은 
+    // facade.subscribe( subscriberName, notificationName , callBack )같은 형태를 취한다.
 
-    // Update view with latest todo content
-    // Subscribes to: newContentAvailable
+    // 최근 할일 내용으로 뷰를 갱신한다.
+    // 구독대상: newContentAvailable
 
     facade.subscribe('contentUpdater', 'newContentAvailable', function (context) {
         var content = context.model.get('content');
@@ -7832,8 +7832,8 @@ function ($, _, facade) {
     });
 
 
-    // Save models when a user has finishes editing
-    // Subscribes to: endContentEditing
+    // 사용자가 편집을 끝냈을 때 모델을 저장한다.
+    // 구독대상: endContentEditing
     facade.subscribe('todoSaver','endContentEditing', function (context) {
         try {
             context.model.save({
@@ -7846,8 +7846,8 @@ function ($, _, facade) {
     });
 
 
-    // Delete a todo when the user no longer needs it
-    // Subscribes to: destroyContent
+    // 사용자가 더이상 할일을 필요로 하지 않을 때 삭제한다.
+    // 구독대상: destroyContent
     facade.subscribe('todoRemover','destroyContent', function (context) {
         try {
             context.model.clear();
@@ -7857,8 +7857,8 @@ function ($, _, facade) {
     });
 
 
-    // When a user is adding a new entry, display a tooltip
-    // Subscribes to: addingNewTodo
+    // 사용자가 새로운 항목을 추가할 때, 툴팁을 보여준다.
+    // 구독대상: addingNewTodo
     facade.subscribe('todoTooltip','addingNewTodo', function (context, todo) {
         var tooltip = context.$('.ui-tooltip-top');
         var val = context.input.val();
@@ -7872,16 +7872,16 @@ function ($, _, facade) {
     });
 
 
-    // Update editing UI on switching mode to editing content
-    // Subscribes to: beginContentEditing
+    // 내용 편집으로 모드를 바꾸면 편집 UI로 갱신한다.
+    // 구독대상: beginContentEditing
     facade.subscribe('editFocus','beginContentEditing', function (context) {
         context.$el.addClass('editing');
         context.input.focus();
     });
 
 
-    // Create a new todo entry
-    // Subscribes to: createWhenEntered
+    // 새로운 할일 항목을 생성한다
+    // 구독대상: createWhenEntered
     facade.subscribe('keyboardManager','createWhenEntered', function (context, e, todos) {
         if (e.keyCode != 13) return;
         todos.create(context.newAttributes());
@@ -7890,8 +7890,8 @@ function ($, _, facade) {
 
 
 
-    // A Todo and remaining entry counter
-    // Subscribes to: renderDone
+    // 할일과 남아있는 항목 계수기
+    // 구독대상: renderDone
     facade.subscribe('todoCounter','renderDone', function (context, Todos) {
         var done = Todos.done().length;
         context.$('#todo-stats').html(context.statsTemplate({
@@ -7902,8 +7902,8 @@ function ($, _, facade) {
     });
 
 
-    // Clear all completed todos when clearContent is dispatched
-    // Subscribes to: clearContent
+    // clearContent가 구동될 때, 완료 할일 모두를 지운다
+    // 구독대상: clearContent
     facade.subscribe('garbageCollector','clearContent', function (Todos) {
         _.each(Todos.done(), function (todo) {
             todo.clear();
@@ -7914,45 +7914,45 @@ function ($, _, facade) {
 });
 ```
 
-That's it for this section. If you've been intrigued by some of the concepts covered, I encourage you to consider taking a look at my [slides](http://addyosmani.com/blog/large-scale-javascript-application-architecture/) on Large-scale JS from the jQuery Summit or my longer post on the topic [here](http://addyosmani.com/largescalejavascript) for more information.
+이것이 이 센션에 대한 모두이다. 당신이 다룬 개념에 대해 호기심이 일어난다면, jQuery Summit의 대규모 JS에 대한 내 [슬라이드](http://addyosmani.com/blog/large-scale-javascript-application-architecture/)나 그 주제에 대한 좀더 긴 [글](http://addyosmani.com/largescalejavascript)을 보길 고려해라.
 
 
-## Paginating Backbone.js Requests & Collections
+## Backbone.js의 페이지 요청과 컬렉션
 
-Pagination is a ubiquitous problem we often find ourselves needing to solve on the web. Perhaps most predominantly when working with back-end APIs and JavaScript-heavy clients which consume them.
+페이징은 우리가 웹상에서 쉽게 발견하는 풀어야만 하는 흔한 문제이다. 서버쪽의 API와 그것을 사용하는 자바스크립트가 많이 포함된 클라이언트를 만들 때, 매우 그러할 것이다.
 
-On this topic, we're going to go through a set of **pagination components** I wrote for Backbone.js, which should hopefully come in useful if you're working on applications which need to tackle this problem. They're part of an extension called [Backbone.Paginator](http://github.com/addyosmani/backbone.paginator).
+이 주제에서, 우리는 Backbone.js를 위해 작성된 **페이징 컴포넌트**들을 경험해 볼 것이다. 그것은 당신이 이 분제를 해결해야만 하는 어플리케이션 작업을 한다면 유용할 것이다. 그것들은 [Backbone.Paginator](http://github.com/addyosmani/backbone.paginator)라 불리는 확장의 일부분이다.
 
-When working with a structural framework like Backbone.js, the three types of pagination we are most likely to run into are:
+Backbone.js와 같은 구조적인 프레임워크로 작업할 때, 동작하길 바라는 세가지 종류의 페이징이 있다:
 
-**Requests to a service layer (API)**- e.g query for results containing the term 'Brendan' - if 5,000 results are available only display 20 results per page (leaving us with 250 possible result pages that can be navigated to).
+**서비스 계층의 요청(API)** - 예를 들면 'Brendan' 이라는 단어가 포함된 결과에 대한 쿼리 - 만일 5000개의 결과가 유효하지만 ( 이동할 수 있는 250개의 결과 페이지는 놓아둔 채 ) 페이지당 20개의 결과만 보여준다면.
 
-This problem actually has quite a great deal more to it, such as maintaining persistence of other URL parameters (e.g sort, query, order) which can change based on a user's search configuration in a UI. One also had to think of a clean way of hooking views up to this pagination so you can easily navigate between pages (e.g First, Last, Next, Previous, 1,2,3), manage the number of results displayed per page and so on.
+이 문제는 실제로 UI에서 사용자의 검색 설정에 기초해서 바뀌는 ( 예를들어 sort, query, order 와 같은 ) 다른 URL 인자의 퍼시스턴스를 유지하는 것과 같은 것 이상의 것을 다룬다. 페이징까지 뷰를 가로채는 깔끔한 방법을 생각해야만 하기 때문에 ( 예를 들어, 처음으로, 마지막으로, 다음으로, 첫번째, 두번째, 세번째 같은 ) 페이지 간에 쉽게 이동도 하고 페이지당 보여지는 결과의 수같은 것도 관리할 수 있다.
 
-**Further client-side pagination of data returned -** e.g we've been returned a JSON response containing 100 results. Rather than displaying all 100 to the user, we only display 20 of these results within a navigatable UI in the browser.
+**반환된 데이타의 더 클라이언트 치중된 페이징** - 예를들어 100개의 결과를 포함하는 JSON 응답을 반환한다. 사용자에게 100개를 보여주기 보다는 브라우져에서 이동할 수 있는 UI와 함께 결과중에서 20개만 보여준다.
 
-Similar to the request problem, client-pagination has its own challenges like navigation once again (Next, Previous, 1,2,3), sorting, order, switching the number of results to display per page and so on.
+요청 문제와 유사하게 클라이언트 페이징은 ( 다음, 이전, 첫번째, 두번째, 세번째같은 ) 재이동, 정렬, 순서, 페이지동 보이는 결과수의 변경에 문제가 있을 수 있다.
 
-**Infinite results** - with services such as Facebook, the concept of numeric pagination is instead replaced with a 'Load More' or 'View More' button. Triggering this normally fetches the next 'page' of N results but rather than replacing the previous set of results loaded entirely, we simply append to them instead.
+**무한 결과** - 페이스 북같은 서비스에서, 숫자에 기반한 페이징 개념은 '더 읽기'나 '더 보기' 버튼으로 대체된다. 이것을 구동하는 것은 보통 N개의 결과 다음 '페이지'를 조회하는 것이지만, 이전에 로드된 결과를 대체하는 것이 아니라 대신 그것에 단순히 추가하는 것이다.
 
-A request pager which simply appends results in a view rather than replacing on each new fetch is effectively an 'infinite' pager.
+각 새로운 조회를 대체하기 보다는 뷰에 그 결과를 단순히 추가하는 요청 페이지 관리자는 효율적인 '무한' 페이지 관리자이다.
 
-**Let's now take a look at exactly what we're getting out of the box:**
+**이제 우리가 외부에서 얻을 것이 무엇인지 정확히 보자:**
 
-*Paginator is a set of opinionated components for paginating collections of data using Backbone.js. It aims to provide both solutions for assisting with pagination of requests to a server (e.g an API) as well as pagination of single-loads of data, where we may wish to further paginate a collection of N results into M pages within a view.*
-
-
-### Paginator's pieces
-
-Backbone.Paginator supports two main pagination components:
-
-* **Backbone.Paginator.requestPager**: For pagination of requests between a client and a server-side API
-* **Backbone.Paginator.clientPager**: For pagination of data returned from a server which you would like to further paginate within the UI (e.g 60 results are returned, paginate into 3 pages of 20)
+*페이징은 Backbone.js를 사용해서 데이타의 컬렉션을 페이지 수를 매기는 독립적인 컴포넌트이다. 그것은 서버로의 요청( 예를들면 API )을 페이징하는 것을 도와주는 해결책과 우리가 N개의 결과 컬렉션을 뷰 안에서 M개의 페이지로 더 페이징하고 싶을 때 한번의 데이타 로드를 페이지로 나누는 해결책 모두를 제공하는 것이 목적이다. *
 
 
-### Live Examples
+### 페이지 관리자의 조각
 
-Live previews of both pagination components using the Netflix API can be found below. Fork the repository to experiment with these examples further.
+Backbone.Paginator는 주요 페이징 컴포넌트를 지원한다:
+
+* **Backbone.Paginator.requestPager**: 클라이언트와 서버쪽 API 사이에 페이징 요청을 위한 것이다
+* **Backbone.Paginator.clientPager**: 서버에서 반환된 데이타를 UI를 통해 더 페이지하고 싶을 때를 위한 것이다. ( 예를들어 60개의 결과가 반환되었을 때 20개씩 3개의 페이지로 페이지를 메기는 경우 )
+
+
+### 실제 예제
+
+아래에 Netflix API를 사용한 두 페이징 컴포넌트의 실제 미리보기가 있다. 이 예제를 더 시험해 보기 위해서 저장소를 복제하라.
 
 * [Backbone.Paginator.requestPager()](http://addyosmani.github.com/backbone.paginator/examples/netflix-request-paging/index.html)
 * [Backbone.Paginator.clientPager()](http://addyosmani.github.com/backbone.paginator/examples/netflix-client-paging/index.html)
@@ -7961,109 +7961,109 @@ Live previews of both pagination components using the Netflix API can be found b
 
 ### Paginator.requestPager
 
-In this section we're going to walkthrough actually using the requestPager.
+이 섹션에서 우리는 requestPager를 사용해서 실제로 돌려볼 것이다.
 
-#### 1. Create a new Paginated collection
+#### 1. 새로운 페이징되는 컬렉션을 생성한다
 
-First, we define a new Paginated collection using `Backbone.Paginator.requestPager()` as follows:
+우선, 우리는 아래와 같이 `Backbone.Paginator.requestPager()`를 사용하는 새로운 페이징되는 컬렉션을 만든다.
 
 ```javascript
 var PaginatedCollection = Backbone.Paginator.requestPager.extend({
 ```
 
-#### 2: Set the model for the collection as normal
+#### 2: 보통때와 같이 컬렉션을 위한 모델을 지정한다.
 
-Within our collection, we then (as normal) specify the model to be used with this collection followed by the URL (or base URL) for the service providing our data (e.g the Netflix API).
+그리고나서 컬렉션 안에, 보통때처럼 데이타를 제공하는 서비스( 예를들어 Netflix API )를 위한 URL ( 혹은 기본 URL )밑에 이 컬렉션으로 사용되는 모델을 지정한다.
 
 ```javascript
         model: model,
 ```
 
-#### 3. Configure the base URL and the type of the request
+#### 3. 기본 URL과 요청의 종류를 설정한다.
 
-We need to set a base URL. The `type` of the request is `GET` by default, and the `dataType` is `jsonp` in order to enable cross-domain requests.
+우리는 기본 URL을 설정해야만 한다. 요청의 `type`는 기본적으로 `GET`이고, `dataType`은 다른 도메인의 요청도 가능하도록 `jsonp`이다.
 
 ```javascript
     paginator_core: {
-      // the type of the request (GET by default)
+      // 요청의 종류( 기본적으로 GET )
       type: 'GET',
 
-      // the type of reply (jsonp by default)
+      // 응답의 종류( 기본적으로 jsonp )
       dataType: 'jsonp',
 
-      // the URL (or base URL) for the service
+      // 서비스에 대한 URL( 혹은 기본 URL )
       url: 'http://odata.netflix.com/Catalog/People(49446)/TitlesActedIn?'
     },
 ```
 
-#### 4. Configure how the library will show the results
+#### 4. 라이브러리가 결과를 어떻게 보여줄지 설정한다.
 
-We need to tell the library how many items per page would we like to see, etc...
+우리는 라이브러리에게 페이지당 얼마나 많은 항목을 보여줄지 같은 것들을 알려줘야만 한다...
 
 ```javascript
     paginator_ui: {
-      // the lowest page index your API allows to be accessed
+      // API가 접근할 수 있는 가장 낮은 페이지 번호
       firstPage: 0,
 
-      // which page should the paginator start from
-      // (also, the actual page the paginator is on)
+      // 페이지 관리자가 시작할 페이지
+      // ( 페이지 관리자가 있을 실제 페이지이기도 하다 )
       currentPage: 0,
 
-      // how many items per page should be shown
+      // 페이지동 얼마나 많은 항목을 보여줄지
       perPage: 3,
 
-      // a default number of total pages to query in case the API or
-      // service you are using does not support providing the total
-      // number of pages for us.
-      // 10 as a default in case your service doesn't return the total
+      // 사용하는 API나 서비스가 전체 페이지 수를
+      // 알려주지 않는 경우의 질의에 대한
+      // 기본 총 페이지 수
+      // 서비스가 total을 반환하지 않는 경우에 10이 기본이다.
       totalPages: 10
     },
 ```
 
-#### 5. Configure the parameters we want to send to the server
+#### 5. 서버에 전달하고 싶은 인자를 설정한다.
 
-Only the base URL won't be enough for most cases, so you can pass more parameters to the server.
-Note how you can use functions insead of hardcoded values, and you can also reffer to the values you specified in `paginator_ui`.
+대부분의 경우에 기본 URL로만 충분치 않기 때문에, 서버에 더 많은 인자를 전달할 수 있다.
+하드코딩된 값 대신에 함수를 사용할 수 있고, `paginator_ui`에 지정한 값을 참조할 수도 있다는 것을 알아둬라.
 
 ```javascript
     server_api: {
-      // the query field in the request
+      // 요청에 대한 질의 항목
       '$filter': '',
 
-      // number of items to return per request/page
+      // 요청( 페이지 )당 반환된는 항목의 수
       '$top': function() { return this.perPage },
 
-      // how many results the request should skip ahead to
-      // customize as needed. For the Netflix API, skipping ahead based on
-      // page * number of results per page was necessary.
+      // 필요에 따라 바꾸기 위해 요청이 건너뛸 결과의 수
+      // Netflix API의 경우, 페이지마다 page * number 수만큼의
+      // 결과를 건너뛰어야 할 필요가 있다.
       '$skip': function() { return this.currentPage * this.perPage },
 
-      // field to sort by
+      // 정렬할 항목
       '$orderby': 'ReleaseYear',
 
-      // what format would you like to request results in?
+      // 요청 결과의 받고 싶은 형태
       '$format': 'json',
 
-      // custom parameters
+      // 사용자 인자
       '$inlinecount': 'allpages',
       '$callback': 'callback'
     },
 ```
 
-#### 6. Finally, configure Collection.parse() and we're done
+#### 6. 마지막으로, Collection.parse()를 설정하면 끝이다.
 
-The last thing we need to do is configure our collection's `parse()` method. We want to ensure we're returning the correct part of our JSON response containing the data our collection will be populated with, which below is `response.d.results` (for the Netflix API).
+해야할 마지막 일은 컬렉션의 `parse()` 메쏘드를 설정하는 것이다. 우리는 컬렉션에 적용될 데이타를 포함하는 JSON응답의 정상적인 부분을 반환하게 하고 싶다. 그것은 아래의 ( Netflix API를 위한 ) `response.d.results`과 같다.
 
-You might also notice that we're setting `this.totalPages` to the total page count returned by the API. This allows us to define the maximum number of (result) pages available for the current/last request so that we can clearly display this in the UI. It also allows us to infuence whether clicking say, a 'next' button should proceed with a request or not.
+당신은 `this.totalPages`가 API에 의해 반환된 전체 페이지 수로 설정되는 것을 알아차렸을 지도 모른다. 이것은 UI에서 명확히 보여주기 위해서 우리가 현재나 마지막 요청에 대해 유용한 최대 ( 결과 ) 페이지 수를 정의하게 해준다. 그것은 또한 우리가 클릭 즉 '다음' 버튼이 요청을 할지 안할지에 대해 영향을 주기도 한다.
 
 ```javascript
         parse: function (response) {
-            // Be sure to change this based on how your results
-            // are structured (e.g d.results is Netflix specific)
+            // 결과가 어떻게 구조화되어있는지에 따라 바뀌어야만 한다
+	    // ( 예를들어 d.results는 Netflix 에서 정한 것이다 )
             var tags = response.d.results;
-            //Normally this.totalPages would equal response.d.__count
-            //but as this particular NetFlix request only returns a
-            //total count of items for the search, we divide.
+            // 보통은 this.totalPages는 response.d.__count과 같지만
+            // 이 특정 NetFlix 요청은 검색에 대한 전체 항목수만 반환하기
+	    // 때문에, 우리는 나누기를 해야 한다.
             this.totalPages = Math.floor(response.d.__count / this.perPage);
             return tags;
         }
@@ -8072,48 +8072,48 @@ You might also notice that we're setting `this.totalPages` to the total page cou
 });
 ```
 
-#### Convenience methods:
+#### 편의 메쏘드:
 
-For your convenience, the following methods are made available for use in your views to interact with the `requestPager`:
+편의를 위해, 다음 메쏘드가 `requestPager`와 상호작용하는 뷰에서 사용 가능하다:
 
-* **Collection.goTo( n, options )** - go to a specific page
-* **Collection.requestNextPage( options )** - go to the next page
-* **Collection.requestPreviousPage( options )** - go to the previous page
-* **Collection.howManyPer( n )** - set the number of items to display per page
+* **Collection.goTo( n, options )** - 특정 페이지로 이동
+* **Collection.requestNextPage( options )** - 다음 페이지로 이동
+* **Collection.requestPreviousPage( options )** - 이전 페이지로 이동
+* **Collection.howManyPer( n )** - 페이지당 보여지는 항목의 수 지정
 
-**requestPager** collection's methods `.goTo()`, `.requestNextPage()` and `.requestPreviousPage()` are all extension of the original [Backbone Collection.fetch() method](http://documentcloud.github.com/backbone/#Collection-fetch). As so, they all can take the same option object as parameter.
+**requestPager** 컬렉션의 메쏘드들 `.goTo()`, `.requestNextPage()`, `.requestPreviousPage()`는 모두 원 [Backbone Collection.fetch() method](http://documentcloud.github.com/backbone/#Collection-fetch)의 확장이다. 그렇기 때문에, 그것들 모두 같은 설정 객체를 인자로 가질 수 있다.
 
-This option object can use `success` and `error` parameters to pass a function to be executed after server answer.
+이 설정 객체는 서버 응답 후에 실행하기 위한 함수를 전달하기 위한 `success`와 `error` 인자를 사용할 수 있다.
 
 ```javascript
 Collection.goTo(n, {
   success: function( collection, response ) {
-    // called is server request success
+    // 새버 요청이 성공하면 호출된다
   },
   error: function( collection, response ) {
-    // called if server request fail
+    // 서바 요청이 실패하면 호출된다
   }
 });
 ```
 
-To manage callback, you could also use the [jqXHR](http://api.jquery.com/jQuery.ajax/#jqXHR) returned by these methods to manage callback.
+콜백을 관리하기 위해, 우리는 콜백을 관리하는 메쏘드들에 의해 반환되는 [jqXHR](http://api.jquery.com/jQuery.ajax/#jqXHR)도 사용할 수 있다.
 
 ```javascript
 Collection
   .requestNextPage()
   .done(function( data, textStatus, jqXHR ) {
-    // called is server request success
+    // 서버 요청이 성공하면 호출된다
   })
   .fail(function( data, textStatus, jqXHR ) {
-    // called if server request fail
+    // 서버 요청이 실패하면 호출된다
   })
   .always(function( data, textStatus, jqXHR ) {
-    // do something after server request is complete
+    // 서버 요청이 완료된 후 어떤것을 한다
   });
 });
 ```
 
-If you'd like to add the incoming models to the current collection, instead of replacing the collection's contents, pass `{add: true}` as an option to these methods.
+현재 컬렉션의 내용을 대체하는 대신에 현재 컬렉션에 들어온 모델을 추가하고 싶으면, 이 메쏘드에 설정으로 `{add: true}`을 전달해라.
 
 ```javascript
 Collection.requestPreviousPage({ add: true });
@@ -8121,10 +8121,10 @@ Collection.requestPreviousPage({ add: true });
 
 ### Paginator.clientPager
 
-The `clientPager` works similar to the `requestPager`, except that our configuration values influence the pagination of data already returned at a UI-level. Whilst not shown (yet) there is also a lot more UI logic that ties in with the `clientPager`. An example of this can be seen in 'views/clientPagination.js'.
+`clientPager`는 설정값이 UI 수준에서 이미 반환된 데이타의 페이징에 영향을 준다는 것만 제외하면 `requestPager`와 유사하게 동작한다. ( 아직 ) 보이지는 않지만 `clientPager`와 엮인 더 많은 UI 로직이 있다. 이 예제는 'views/clientPagination.js'에서 볼 수 있다.
 
-#### 1. Create a new paginated collection with a model and URL
-As with `requestPager`, let's first create a new Paginated `Backbone.Paginator.clientPager` collection, with a model:
+#### 1. 모델과 URL을 사용해서 새로운 페이징되는 컬렉션을 만든다.
+우선 `requestPager`로 model을 갖는 새로운 페이징되는 `Backbone.Paginator.clientPager` 컬렉션을 만든다:
 
 ```javascript
     var PaginatedCollection = Backbone.Paginator.clientPager.extend({
@@ -8132,80 +8132,80 @@ As with `requestPager`, let's first create a new Paginated `Backbone.Paginator.c
         model: model,
 ```
 
-#### 2. Configure the base URL and the type of the request
+#### 2. 기본 URL과 요청 종류를 설정한다.
 
-We need to set a base URL. The `type` of the request is `GET` by default, and the `dataType` is `jsonp` in order to enable cross-domain requests.
+우리는 기본 URL을 설정해야만 한다. 요청의 `type`는 기본적으로 `GET`이고, `dataType`은 다른 도메인의 요청도 가능하도록 `jsonp`이다.
 
 ```javascript
     paginator_core: {
-      // the type of the request (GET by default)
+      // 요청의 종류( 기본적으로 GET )
       type: 'GET',
 
-      // the type of reply (jsonp by default)
+      // 응답의 종류( 기본적으로 jsonp )
       dataType: 'jsonp',
 
-      // the URL (or base URL) for the service
+      // 서비스에 대한 URL( 혹은 기본 URL )
       url: 'http://odata.netflix.com/v2/Catalog/Titles?&'
     },
 ```
 
-#### 3. Configure how the library will show the results
+#### 3. 라이브러리가 결과를 어떻게 보여줄지 설정한다.
 
-We need to tell the library how many items per page would we like to see, etc...
+우리는 라이브러리에게 페이지당 얼마나 많은 항목을 보여줄지 같은 것들을 알려줘야만 한다...
 
 ```javascript
     paginator_ui: {
-      // the lowest page index your API allows to be accessed
+      // API가 접근할 수 있는 가장 낮은 페이지 번호
       firstPage: 1,
 
-      // which page should the paginator start from
-      // (also, the actual page the paginator is on)
+      // 페이지 관리자가 시작할 페이지
+      // ( 페이지 관리자가 있을 실제 페이지이기도 하다 )
       currentPage: 1,
 
-      // how many items per page should be shown
+      // 페이지동 얼마나 많은 항목을 보여줄지
       perPage: 3,
 
-      // a default number of total pages to query in case the API or
-      // service you are using does not support providing the total
-      // number of pages for us.
-      // 10 as a default in case your service doesn't return the total
+      // 사용하는 API나 서비스가 전체 페이지 수를
+      // 알려주지 않는 경우의 질의에 대한
+      // 기본 총 페이지 수
+      // 서비스가 total을 반환하지 않는 경우에 10이 기본이다.
       totalPages: 10
     },
 ```
 
-#### 4. Configure the parameters we want to send to the server
+#### 4. 서버에 전달하고 싶은 인자를 설정한다.
 
-Only the base URL won't be enough for most cases, so you can pass more parameters to the server.
-Note how you can use functions insead of hardcoded values, and you can also reffer to the values you specified in `paginator_ui`.
+대부분의 경우에 기본 URL로만 충분치 않기 때문에, 서버에 더 많은 인자를 전달할 수 있다.
+하드코딩된 값 대신에 함수를 사용할 수 있고, `paginator_ui`에 지정한 값을 참조할 수도 있다는 것을 알아둬라.
 
 ```javascript
     server_api: {
-      // the query field in the request
+      // 요청에 대한 질의 항목
       '$filter': 'substringof(\'america\',Name)',
 
-      // number of items to return per request/page
+      // 요청( 페이지 )당 반환된는 항목의 수
       '$top': function() { return this.perPage },
 
-      // how many results the request should skip ahead to
-      // customize as needed. For the Netflix API, skipping ahead based on
-      // page * number of results per page was necessary.
+      // 필요에 따라 바꾸기 위해 요청이 건너뛸 결과의 수
+      // Netflix API의 경우, 페이지마다 page * number 수만큼의
+      // 결과를 건너뛰어야 할 필요가 있다.
       '$skip': function() { return this.currentPage * this.perPage },
 
-      // field to sort by
+      // 정렬할 항목
       '$orderby': 'ReleaseYear',
 
-      // what format would you like to request results in?
+      // 요청 결과의 받고 싶은 형태
       '$format': 'json',
 
-      // custom parameters
+      // 사용자 인자
       '$inlinecount': 'allpages',
       '$callback': 'callback'
     },
 ```
 
-#### 5. Finally, configure Collection.parse() and we're done
+#### 5. 마지막으로, Collection.parse()를 설정하면 끝이다.
 
-And finally we have our `parse()` method, which in this case isn't concerned with the total number of result pages available on the server as we have our own total count of pages for the paginated data in the UI.
+그리고 마지막으로 우리는 `parse()` 메쏘드가 있다. 그것은 이 경우에 UI에서 데이타를 페이징하기 위한 자체적인 전체 페이지 수를 갖고 있기 때문에 서버에서 가용한 총 결과 페이지수에 관심이 없다. 
 
 ```javascript
     parse: function (response) {
@@ -8216,37 +8216,37 @@ And finally we have our `parse()` method, which in this case isn't concerned wit
     });
 ```
 
-#### Convenience methods:
+#### 편의 메쏘드:
 
-As mentioned, your views can hook into a number of convenience methods to navigate around UI-paginated data. For `clientPager` these include:
+언급한 대로, 뷰가 UI 페이징 데이타를 이동하는 많은 편의 메쏘드를 가로챈다. `clientPager`을 위한 것은 다음과 같다:
 
-* **Collection.goTo(n)** - go to a specific page
-* **Collection.previousPage()** - go to the previous page
-* **Collection.nextPage()** - go to the next page
-* **Collection.howManyPer(n)** - set how many items to display per page
-* **Collection.setSort(sortBy, sortDirection)** - update sort on the current view. Sorting will automatically detect if you're trying to sort numbers (even if they're strored as strings) and will do the right thing.
-* **Collection.setFilter(filterFields, filterWords)** - filter the current view. Filtering supports multiple words without any specific order, so you'll basically get a full-text search ability. Also, you can pass it only one field from the model, or you can pass an array with fields and all of them will get filtered. Last option is to pass it an object containing a comparison method and rules. Currently, only ```levenshtein``` method is available.
+* **Collection.goTo(n)** - 특정 페이지로 이동
+* **Collection.previousPage()** - 다음 페이지로 이동
+* **Collection.nextPage()** - 이전 페이지로 이동
+* **Collection.howManyPer(n)** - 페이지당 보여지는 항목의 수 지정
+* **Collection.setSort(sortBy, sortDirection)** - 현재 뷰의 정렬을 갱신. 숫자( 문자열로 저장되어 있더라도 )를 정렬하려고 하면, 정렬은 자동으로 감지해서 잘 동작할 것이다.
+* **Collection.setFilter(filterFields, filterWords)** - 현재 뷰의 필더. 필터 기능은 순서없이 여러 단어를 지원하기 때문에 기본적으로 전체 문제 검색 기능을 가지고 있다. 또한, 당신이 모델의 한 항목이나 항목의 배열을 전달할 수 있고, 그 모두는 걸러질 것이다. 마지막 옵션은 비교 메쏘드와 규칙을 포함하는 객체를 전달하기 위한 것이다. 현재는 ```levenshtein``` 메쏘드만 사용가능하다.
 
 ```javascript
   this.collection.setFilter(
     {'Name': {cmp_method: 'levenshtein', max_distance: 7}}
-    , 'Amreican P' // Note the switched 'r' and 'e', and the 'P' from 'Pie'
+    , 'Amreican P' // 'r'과 'e'가 바꿔었고 'Pie'의 'P'에 주의해라
   );
 ```
 
-Also note that the levenshtein plugin should be loaded and enabled using the ```useLevenshteinPlugin``` variable.
+플러그인이 ```useLevenshteinPlugin``` 변수를 사용해서 로드되고 활성화된다는 점도 주의해라.
 
-Last but not less important: Performing Levenshtein comparison returns the ```distance``` between to strings. It won't let you *search* lenghty text.
+마지막으로 중요한 것: Levenshtein 비교 동작은 문자열 사이의 ```거리```를 반환한다. 그것이 긴 문자열 *검색*을 하게 해주지는 않는다.
 
-The distance between two strings means the number of characters that should be added, removed or moved to the left or to the right so the strings get equal.
+두 문자열 사이의 거리는 문자열이 같아지기 위해 추가되거나 삭제되거나 왼쪽 혹은 오른쪽으로 이동한 글자의 숫자를 의미한다.
 
-That means that comparing "Something" in "This is a test that could show something" will return 32, which is bigger than comparing "Something" and "ABCDEFG" (9).
+"This is a test that could show something"에 대해서 "Something" 비교하는 것은 32를 반환한다는 것을 의미하는데, 그것은 "Something"와 "ABCDEFG"의 비교( 9 )보다 크다.
 
-Use levenshtein only for short texts (titles, names, etc).
+( 제목, 이름 등등 같은 ) 짧은 문장에서만 levenshtein을 사용해라.
 
-* **Collection.doFakeFilter(filterFields, filterWords)** - returns the models count after fake-applying a call to ```Collection.setFilter```.
+* **Collection.doFakeFilter(filterFields, filterWords)** - ```Collection.setFilter```을 가짜로 호출한 뒤의 모델의 수를 반환한다.
 
-* **Collection.setFieldFilter(rules)** - filter each value of each model according to `rules` that you pass as argument. Example: You have a collection of books with 'release year' and 'author'. You can filter only the books that were released between 1999 and 2003. And then you can add another `rule` that will filter those books only to authors who's name start with 'A'. Possible rules: function, required, min, max, range, minLength, maxLength, rangeLength, oneOf, equalTo, pattern.
+* **Collection.setFieldFilter(rules)** - 인자로 전달한 `rules`에 따라 각 모델의 값들을 거른다. 예제: 당신은 '발행 연도'와 '작가'를 가진 책의 컬렉션을 가지고 있다. 당신은 1999년과 2003년 사이에 발행된 책들만 거를 수 있다. 그리고 나서 이들 책을 'A'로 시작하는 이름을 가진 작가들만 거르는 또다른 `rule`을 추가할 수 있다. 가능한 규칙: function, required, min, max, range, minLength, maxLength, rangeLength, oneOf, equalTo, pattern.
 
 
 ```javascript
@@ -8256,7 +8256,7 @@ Use levenshtein only for short texts (titles, names, etc).
     {field: 'author', type: 'pattern', value: new RegExp('A*', 'igm')}
   ]);
 
-  //Rules:
+  //규칙:
   //
   //var my_var = 'green';
   //
@@ -8274,40 +8274,40 @@ Use levenshtein only for short texts (titles, names, etc).
 
 ```
 
-* **Collection.doFakeFieldFilter(rules)** - returns the models count after fake-applying a call to ```Collection.setFieldFilter```.
+* **Collection.doFakeFieldFilter(rules)** - ```Collection.setFieldFilter```을 가짜로 호출한 뒤 모델의 수를 반환한다.
 
-#### Implementation notes:
+#### 구현에 관한 주요점:
 
-You can use some variables in your ```View``` to represent the actual state of the paginator.
+당신은 페이지 관리자의 실제 상태를 보여주는 ```뷰```에서 몇몇 변수를 사용할 수 있다.
 
-```totalUnfilteredRecords``` - Contains the number of records, including all records filtered in any way. (Only available in ```clientPager```)
+```totalUnfilteredRecords``` - 어떤 식으로든 걸러진 전체 항목까지 포함한 항목의 수를 포함한다.( ```clientPager``` 에서만 사용가능 )
 
-```totalRecords``` - Contains the number of records
+```totalRecords``` - 항목의 수를 포함한다.
 
-```currentPage``` - The actual page were the paginator is at.
+```currentPage``` - 페이지 관리자가 있는 실제 페이지.
 
-```perPage``` - The number of records the paginator will show per page.
+```perPage``` - 페이지 관리자가 페이지마다 보여주는 항목의 수.
 
-```totalPages``` - The number of total pages.
+```totalPages``` - 전체 페이지 수.
 
-```startRecord``` - The posicion of the first record shown in the current page (eg 41 to 50 from 2000 records) (Only available in ```clientPager```)
+```startRecord``` - 현재 페이지에서 보여지는 첫번째 항목의 위치( 예를 들면 2000개의 항목에서 41에서 50 ) ( ```clientPager``` 에서만 사용가능 )
 
-```endRecord``` - The posicion of the last record shown in the current page (eg 41 to 50 from 2000 records) (Only available in ```clientPager```)
+```endRecord``` - 현재 페이지에서 보여지는 마지막 항목의 위치( 예를 들면 2000개의 항목에서 41에서 50 ) ( ```clientPager``` 에서만 사용가능 )
 
-### Plugins
+### 플러그인
 
 **Diacritic.js**
 
-A plugin for Backbone.Paginator that replaces diacritic characters (ă,ş,ţ etc) with characters that match them most closely. This is particularly useful for filtering.
+(ă,ş,ţ 등등 같은) 발음 기호를 가장 근접한 문자로 바꿔주는 Backbone.Paginator을 위한 플러그인. 이것은 필터링에 특히 유용하다.
 
-To enable the plugin, set `this.useDiacriticsPlugin` to true, as can be seen in the example below:
+플러그인을 활성화하기 위해서, 아래의 예제에서 보듯이 `this.useDiacriticsPlugin`를 true로 지정해라:
 
 ```javascript
 Paginator.clientPager = Backbone.Collection.extend({
 
-    // Default values used when sorting and/or filtering.
+    // 정렬, 혹은 필터링할 때( 또는 동시에 사용할 때 ), 사용하는 기본값Default values used when sorting and/or filtering.
     initialize: function(){
-      this.useDiacriticsPlugin = true; // use diacritics plugin if available
+      this.useDiacriticsPlugin = true; // 가능하면 diacritics 플러그인을 사용한다.
     ...
 ```
 
@@ -8320,31 +8320,31 @@ Paginator.clientPager = Backbone.Collection.extend({
  [7]: https://github.com/cowboy/grunt
 
 
-# Mobile Applications
+# 모바일 어플리케이션
 
 ## Backbone & jQuery Mobile
 
-### Resolving the routing conflicts
+### 라우팅 충돌 해결
 
-The first major hurdle developers typically run into when building Backbone applications with jQuery Mobile is that both frameworks have their own opinions about how to handle application navigation.
+개발자가 jQuery Mobile로 Backbone 어플리케이션을 만들 때, 만나는 전형적인 첫번째 주요 관문은 두 프레임워크가 어플리케이션 이동을 제어하는 방법에 있어서 자신만의 방안을 가지고 있다는 것이다.
 
-Backbone's routers offer an explicit way to define custom navigation routes through `Backbone.Router`, whilst jQuery Mobile encourages the use of URL hash fragments to reference separate 'pages' or views in the same document. jQuery Mobile also supports automatically pulling in external content for links through XHR calls meaning that there can be quite a lot of inter-framework confusion about what a link pointing at '#photo/id' should actually be doing.
+Backbone의 라우터는 `Backbone.Router`를 통해 사용자가 이동 지점을 정의하는 명시적인 방식을 제안하는 반면, jQuery Mobile은 분리된 '페이지들'이나 동일 문서의 뷰를 참조하기 위한 URL 해쉬 조각의 사용을 권장한다. jQuery Mobile도 '#photo/id'에서 가리키는 링크가 실제로 하는 것에 대한 많은 내부 프레임워크 혼동이 될 수도 있는 XHR 호출을 통해 링크의 외부 내용을 자동적으로 가져오는 것을 지원한다.
 
-Some of the solutions that have been previously proposed to work-around this problem included manually patching Backbone or jQuery Mobile. I discourage opting for these techniques as it becomes necessary to manually patch your framework builds when new releases get made upstream.
+이 문제를 회피하기 위해 이전에 제안된 몇가지 해결책은 직접 수정된 Backbone이나 jQuery Mobile을 포함하는 것이다. 나는 새로운 배포본이 반영되었을 때, 프레임워크를 직접 수정해야만 하기 때문에 이런 방식을 선호하지 않는다.
 
-There's also [jQueryMobile router](https://github.com/azicchetti/jquerymobile-router), which tries to solve this problem differently, however I think my proposed solution is both simpler and allows both frameworks to cohabit quite peacefully without the need to extend either. What we're after is a way to prevent one framework from listening to hash changes so that we can fully rely on the other (e.g. `Backbone.Router`) to handle this for us exclusively.
+이 문제를 다르게 해결하려고 하는 [jQueryMobile 라우터](https://github.com/azicchetti/jquerymobile-router)도 있지만, 나는 내가 제안하는 해결책이 더 단순하면서 두 프레임워크가 서로 확장할 필요도 없이 평화롭게 양립할 수 있게 해준다고 생각한다. 우리가 추구하는 것은 해쉬 변경을 처리하기 위해 하나의 프레임워크( 예를 들어 `Backbone.Router` )에 완전히 의존하기 위해서 다른 하나의 프레임워크가 해쉬 변경을 감시하지 않도록 하는 방식이다.
 
-Using jQuery Mobile this can be done by setting:
+jQuery Mobile을 사용해서 다음 설정을 적용한다:
 
 ```javascript
 $.mobile.hashListeningEnabled = false;
 ```
 
-prior to initializing any of your other code.
+다른 코드가 초기화되기 전에 하라.
 
-I discovered this method looking through some jQuery Mobile commits that didn't make their way into the official docs, but am happy to see that they are now covered here http://jquerymobile.com/test/docs/api/globalconfig.html in more detail.
+나는 정식 문서에는 없지는 jQuery Mobile 커밋을 통해 발견한 이 방법을 알아내고 지금에 더 자세한 것은 여기 http://jquerymobile.com/test/docs/api/globalconfig.html에서 찾을 수 있어서 기쁘다.
 
-The next question that arises is, if we're preventing jQuery Mobile from listening to URL hash changes, how can we still get the benefit of being able to navigate to other sections in a document using the built-in transitions and effects supported? Good question. This can now be solve by simply calling `$.mobile.changePage()` as follows:
+생각다는 다음 질문은 만일 jQuery Mobile이 URL 해쉬 변경을 감시하지 못하도록 막으면 지원되는 내장된 이동과 효과를 사용해서 문서내의 다른 섹션으로 이동할 수 있는 장점을 어떻게 살릴 것인가? 이다. 좋은 질문이다. 이것은 단순히 다음과 같이 `$.mobile.changePage()`를 호출함으로써 해결할 수 있다:
 
 ```javascript
 var url = '#about',
@@ -8355,22 +8355,22 @@ var url = '#about',
 $.mobile.changePage( url , { transition: effect}, reverse, changeHash );
 ```
 
-In the above sample, `url` can refer to a URL or a hash identifier to navigate to, `effect` is simply the transition effect to animate the page in with and the final two parameters decide the direction for the transition (`reverse`) and whether or not the hash in the address bar should be updated (`changeHash`). With respect to the latter, I typically set this to false to avoid managing two sources for hash updates, but feel free to set this to true if you're comfortable doing so.
+위의 예제에서, `url`은 이동할 URL이나 해쉬 아이디를 참조할 수 있고, `effect`는 페이지가 움직이는 단순한 이동이고, 마지막 두 인자는 이동( `reverse` ) 방향과 주소창에 해쉬가 갱신( `changeHash` )되어야 하는지 아닌지 이다. 후자의 관점에서, 나는 보통 해쉬 갱신의 두 원본 관리를 피하기 위해 false를 설정하지만 당신이 편하다면 자유로이 true로 설정해도 된다.
 
-**Note:** For some parallel work being done to explore how well the jQuery Mobile Router plugin works with Backbone, you may be interested in checking out [https://github.com/Filirom1/jquery-mobile-backbone-requirejs](https://github.com/Filirom1/jquery-mobile-backbone-requirejs).
+**주의:** jQuery Mobile Router 플르그인을 Backbone과 함께 돌리기 위한 방법을 알아보기 위해 같이 해야할 작업을 위해, [https://github.com/Filirom1/jquery-mobile-backbone-requirejs](https://github.com/Filirom1/jquery-mobile-backbone-requirejs)을 확인하고 싶을지도 모르겠다.
 
 
-### Exercise: A Backbone, Require.js/AMD app with jQuery Mobile
+### 연습: jQuery Mobile을 사용한 Backbone, Require.js/AMD 앱
 
-**Note:** The code for this exercise can be found in `practicals/modular-mobile-app`.
+**주의:** 이 연습을 위한 코드는 `practicals/modular-mobile-app`에서 찾을 수 있다.
 
-### Getting started
+### 시작하기
 
-Once you feel comfortable with the [Backbone fundamentals](http://msdn.microsoft.com/en-us/scriptjunkie/hh377172.aspx) and you've put together a rough wireframe of the app you may wish to build, start to think about your application architecture. Ideally, you'll want to logically separate concerns so that it's as easy as possible to maintain the app in the future.
+일단 당신이 [Backbone fundamentals](http://msdn.microsoft.com/en-us/scriptjunkie/hh377172.aspx)이 편하게 느껴지면, 만들고 싶은 앱의 대충의 설계도를 모으고 어플리케이션 구조에 대해 생각해기 시작해라. 이상적으로 당신은 가능한 미래에 앱을 유지보수하기 쉽게 하기 위해 논리적으로 관심을 분리하고 싶다.
 
-**Namespacing**
+**이름공간**
 
-For this application, I opted for the nested namespacing pattern. Implemented correctly, this enables you to clearly identify if items being referenced in your app are views, other modules and so on. This initial structure is a sane place to also include application defaults (unless you prefer maintaining those in a separate file).
+이 어플리케이션을 위해서, 나는 중첩된 이름 공간 패턴을 선택하였다. 정확히 구현하였다면 이것은 앱에서 참조되는 항목들이 뷰인지 다른 모듈인지 그외인지 명확히 구분하게 해준다. 이 초기 구조는 ( 당신이 분리된 파일로 관리하는 것을 선호하지 않는다면 ) 어플리케이션 기본도 포함하고 있는 올바른 것이다.
 
 ```javascript
 window.mobileSearch = window.mobileSearch || {
@@ -8390,48 +8390,48 @@ window.mobileSearch = window.mobileSearch || {
 }
 ```
 
-**Models**
+**모델**
 
-In the Flickly application, there are at least two unique types of data that need to be modeled - search results and individual photos, both of which contain additional meta-data like photo titles. If you simplify this down, search results are actually groups of photos in their own right, so the application only requires:
+flickly 어플리케이션에는 최소한 모델이 되어야만하는 두개의 독특한 데이타 타입이 있다 - 검색 결과와 개별 사진, 둘다 사진 제목과 같은 추가적인 메타 정보를 포함하고 있다. 당신이 이것을 단순화한다면, 검색 결과는 실제로 적당한 사직 묶음들이기 때문에 어플리케이션은 단지 다음의 것만 필요로 한다:
 
-* A single model (a photo or 'result' entry)
-* A result collection (containing a group of result entries) for search results
-* A photo collection (containing one or more result entries) for individual photos or photos with more than one image
+* 단일 모델( 사진 혹은 '결과' 항목 )
+* 검색 결과를 위한 ( 결과 항목들을 포함하는 ) 결과 컬렉션
+* 각각의 사진 혹은 하나 이상의 사진들을 위한 ( 하나 이상의 결과 항목을 포함하는 ) 사진 컬렉션
 
-**Views**
+**뷰**
 
-The views we'll need include an application view, a search results view and a photo view. Static views or pages of the single-page application which do not require a dynamic element to them (e.g an 'about' page) can be easily coded up in your document's markup, independent of Backbone.
+우리가 필요로 하는 뷰는 어플리케이션 뷰, 검색 결과 뷰, 사진 뷰이다. 페이지에 동적인 요소를 필요로 하지 않는 단일 페이지 어플리케이션의 정적 뷰나 페이지( 예를 들면 'about' 페이지 )는 Backbone과 관계없이 문서의 마크업으로 쉽게 작성될 수 있다.
 
-**Routers**
+**라우터**
 
-A number of possible routes need to be taken into consideration:
+많은 가능한 지점은 신중하게 선택되어야만 한다:
 
-* Basic search queries `#search/kiwis`
-* Search queries with additional parameters (e.g sort, pagination) `#search/kiwis/srelevance/p7`
-* Queries for specific photos `#photo/93839`
-* A default route (no parameters passed)
-
-
-This tutorial will be expanded shortly to fully cover the demo application. In the mean time, please see the practicals folder for the completed application that demonstrates the router resolution discussed earlier between Backbone and jQuery Mobile.
+* 기본 검색 질의 `#search/kiwis`
+* ( 예를들어 정렬이나 페이징같은 ) 추가적인 인자를 갖는 검색 질의 `#search/kiwis/srelevance/p7`
+* 특정 사진을 위한 질의 `#photo/93839`
+* 기본 지점( 인자는 전달되지 않음 )
 
 
-### jQuery Mobile: Going beyond mobile application development
-
-The majority of jQM apps I've seen in production have been developed for the purpose of providing an optimal experience to users on mobile devices. Given that the framework was developed for this purpose, there's nothing fundamentally wrong with this, but many developers forget that jQM is a UI framework not dissimilar to jQuery UI. It's using the widget factory and is capable of being used for a lot more than we give it credit for.
-
-If you open up Flickly in a desktop browser, you'll get an image search UI that's modeled on Google.com, however, review the components (buttons, text inputs, tabs) on the page for a moment. The desktop UI doesn't look anything like a mobile application yet I'm still using jQM for theming mobile components; the tabs, date-picker, sliders - everything in the desktop UI is re-using what jQM would be providing users on mobile devices. Thanks to some media queries, the desktop UI can make optimal use of whitespace, expanding component blocks out and providing alternative layouts whilst still making use of jQM as a component framework.
-
-The benefit of this is that I don't need to go pulling in jQuery UI separately to be able to take advantage of these features. Thanks to the recent ThemeRoller my components can look pretty much exactly how I would like them to and users of the app can get a jQM UI for lower-resolutions and a jQM-ish UI for everything else.
-
-The takeaway here is just to remember that if you're not (already) going through the hassle of conditional script/style loading based on screen-resolution (using matchMedia.js etc), there are simpler approaches that can be taken to cross-device component theming.
+이 안내서는 데모 어플리케이션을 완전히 다루기 위해 간단히 확장될 것이다. 중간에, Backbone과 jQuery Mobile 사이에 이전에 논의했던 라우터 해결법을 보여주는 전체 어플리케이션을 위해서는 practicals 폴더를 보세요.
 
 
-# Unit Testing
+### jQuery Mobile: 모바일 어플리케이션 개발을 뛰어 넘기
+
+내가 제풍으로 본 jQM 앱의 대다수는 모바일 장치에서 사용자에기 최적의 경험을 주는 것을 목적으로 개발되었다. 프레임워크가 이런 목적을 위해 개발되었다고 가정하면, 기본적으로 잘못된 것은 없지만, 많은 개발자들이 jQM이 jQuery와 다르지 않은 UI 프레임워크라는 것을 잊는다. 그것은 위젯 팩토리를 사용하고 우리가 허용한 것 이상을 위해 사용될 수 있다.
+
+당신이 데스크탑 브라우져에서 Flickly를 연다면, 당신은 Google.com과 비슷한 이미지 검색 UI를 얻을 것이지만, 잠깐동안 페이지상의 컴포넌트( 버튼, 텍스트 입력, 탭 )를 살펴보자. 내가 여전히 모파일 컴포넌트를 테마로 하기 위해서 jQM을 쓰고 있지만, 데스크탑 UI는 모바일 어플리케이션같이 보이지 않는다: 탭, 날짜 선택기, 슬라이더 - 데스크탑 UI의 모든 것은 jQM이 사용자에게 모바일 장치에서 제공하는 것을 재사용하고 있다. 미디어 쿼리 덕분에, 컴포넌트 블럭을 확장하고 또 다른 레이아웃을 제공하면서 데스크탑 UI는 공백을 최적으로 사용할 수 있는 반면 여전히 jQM을 컴포넌트 프레임워크로 사용할 수 있다.
+
+그 장점은 그 특징의 잇점을 가지는 jQuery UI를 따로 가져갈 필요가 없다는 점이다. 최근 ThemeRoller 덕분에 내 컴포넌트는 정확히 내가 원했던 것대로 이쁘게 보이고 앱 사용자들은 다른 모든 것에 대해서 낮은 해상도와 jQM스러운 jQM UI를 가질 수 있다.
+
+여기서 얻을 것은 당신이 ( matchMedia.js등을 사용해서 ) 화면 해상도에 따른 조건적인 스크립트/스타일 로딩의 문제를 ( 이미 ) 겪지 않았다면, 여러장치를 지원하는 컴포넌트 테마를 가지게 하는 더 단순한 방법이 있다는 것을 기억하는 것이다.
 
 
-## Unit Testing Backbone Applications With Jasmine
+# 단위 테스트
 
-## Introduction
+
+## Jasmine을 사용해서 Backbone 어플리케이션을 단위 테스트하기
+
+## 소개
 
 One definition of unit testing is the process of taking the smallest piece of testable code in an application, isolating it from the remainder of your codebase and determining if it behaves exactly as expected. In this section, we'll be taking a look at how to unit test Backbone applications using a popular JavaScript testing framework called [Jasmine](http://pivotal.github.com/jasmine/) from Pivotal Labs.
 
