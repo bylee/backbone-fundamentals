@@ -9755,24 +9755,24 @@ jQuery ```$.ajax()``` 요청은 테스트 자원에 접속해서 반환된 데�
 
 # SinonJS
 
-Similar to the section on testing Backbone.js apps using the Jasmine BDD framework, we're nearly ready to take what we've learned and write a number of QUnit tests for our Todo application.
+Jasmine BDD 프레임워크로 Backbone.js 앱을 테스트하는 섹션과 비슷하게 우리는 거의 다 배웠고, 우리 Todo 어플리케이션에 대한 많은 QUnit 테스트를 작성했다.
 
-Before we start though, you may have noticed that QUnit doesn't support test spies. Test spies are functions which record arguments, exceptions and return values for any of their calls. They're typically used to test callbacks and how functions may be used in the application being tested. In testing frameworks, spies can usually be either anonymous functions or wrap functions which already exist.
+우리가 시작하기 전에, 당신은 QUnit이 테스트 스파이를 지언하지 않는다는 것을 알아차릴 것이다. 테스트 스파이는 어떤 호출에 대한 인자, 예외, 반환값을 기록하는 함수이다. 그것들은 일반적으로 테스트 콜백과 테스트되는 어플리케이션 안에서 함수 사용법을 테스트한다.테스트 프레임워크에서 스파이는 보통 익명 함수이거나 이미 존재하는 래핑 함수이다.
 
 
-## What is SinonJS?
+## SinonJS는 무엇인가?
 
-In order for us to substitute support for spies in QUnit, we will be taking advantage of a mocking framework called [SinonJS](http://sinonjs.org/) by Christian Johansen. We will also be using the [SinonJS-QUnit adapter](http://sinonjs.org/qunit/) which provides seamless integration with QUnit (meaning setup is minimal). Sinon.JS is completely test-framework agnostic and should be easy to use with any testing framework, so it's ideal for our needs.
+우리가 QUnit에서 스파이 지원을 대체하기 위해, 우리는 Christian Johansen이 만든 [SinonJS](http://sinonjs.org/)라는 목 프레임워크를 이용할 것이다. 우리는 또한 QUnit과 자연스럽운 통합( 설정이 최소화되었음을 뜻한다 )을 제공하는 [SinonJS-QUnit adapter](http://sinonjs.org/qunit/)도 사용할 것이다. Sinon.JS는 완전히 보이지 않는 테스트 프레임워크이고, 어떤 테스트 프레임워크와 같이 사용하는 것이 쉬워야만 한다. 그래서 그것은 우리의 요건에 딱 맞는다.
 
-The framework supports three features we'll be taking advantage of for unit testing our application:
+그 프레임워크는 어플리케이션을 단위 테스트하는데 이용할만한 세가지 기능을 지원한다:
 
-* **Anonymous spies**
-* **Spying on existing methods**
-* **A rich inspection interface**
+* **익명 스파이**
+* **존재하는 함수에 대한 스파이**
+* **풍부한 관찰 인터페이스**
 
-Using ```this.spy()``` without any arguments creates an anonymous spy. This is comparable to ```jasmine.createSpy()``` and we can observe basic usage of a SinonJS spy in the following example:
+인자없인 ```this.spy()```를 사용하는 것이 익명 스파이를 생성한다. 이것은 ```jasmine.createSpy()```에 비유되고 다음 예제에서 SinonJS 스파이의 기본 사용을 볼 수 있다:
 
-#### Basic Spies:
+#### 기본 스파이:
 ```javascript
 test('should call all subscribers for a message exactly once', function () {
     var message = getUniqueString();
@@ -9785,9 +9785,9 @@ test('should call all subscribers for a message exactly once', function () {
 });
 ```
 
-We can also use ```this.spy()``` to spy on existing functions (like jQuery's ```$.ajax```) in the example below. When spying on a function which already exists, the function behaves normally but we get access to data about its calls which can be very useful for testing purposes.
+우리는 아래 예제와 같이 ( jQuery의 ```$.ajax``` 같은 ) 존재하는 함수를 스파이하기 위해 ```this.spy()```를 사용할 수도 있다. 이미 있는 함수를 스파이할 때, 함수는 보통과 같이 동작하지만 우리는 테스트 목적에 매우 유용할 수 있는 호출에 대한 데이타에 접근할 수 있다.
 
-#### Spying On Existing Functions:
+#### 존재하는 함수의 스파이:
 ```javascript
 test( 'should inspect jQuery.getJSON's usage of jQuery.ajax', function () {
     this.spy( jQuery, 'ajax' );
@@ -9800,10 +9800,10 @@ test( 'should inspect jQuery.getJSON's usage of jQuery.ajax', function () {
 });
 ```
 
-SinonJS comes with a rich spy interface which allows us to test whether a spy was called with a specific argument, if it was called a specific number of times and test against the values of arguments. A complete list of features supported in the interface can be found here (http://sinonjs.org/docs/), but let's take a look at some examples demonstrating some of the most commonly used ones:
+SinonJS는 만일 특정 수만큼 호출되었고 인자의 값에 대해 테스트한다면 c스파이가 특정 인자로 호출되었는지를 테스트하게 해주는 풍부한 스파이 인터페이스를 가지고 있다. 인터페이스에서 지원하는 기능 목록은 여기(http://sinonjs.org/docs/)에서 찾을 수 있지만, 매우 일반적으로 사용되는 몇 가지를 보여주는 예제를 한번 보자:
 
 
-#### Matching arguments: test a spy was called with a specific set of arguments:
+#### 인자 일치: 스파이가 특정 인자들로 호출되는지 테스트한다:
 
 ```javascript
 test( 'Should call a subscriber with standard matching': function () {
@@ -9816,7 +9816,7 @@ test( 'Should call a subscriber with standard matching': function () {
 });
 ```
 
-#### Stricter argument matching: test a spy was called at least once with specific arguments and no others:
+#### 더 엄격한 인자 일치: 스파이가 적어도 한번 특정 인자들로만 호출되는지 테스트:
 
 ```javascript
 test( 'Should call a subscriber with strict matching': function () {
@@ -9834,7 +9834,7 @@ test( 'Should call a subscriber with strict matching': function () {
 });
 ```
 
-#### Testing call order: testing if a spy was called before or after another spy:
+#### 호출 순서 테스트: 스파이가 다른 스파이 전후로 호출되었는지 테스트:
 
 ```javascript
 test( 'Should call a subscriber and maintain call order': function () {
@@ -9852,7 +9852,7 @@ test( 'Should call a subscriber and maintain call order': function () {
 });
 ```
 
-#### Match execution counts: test a spy was called a specific number of times:
+#### 실행 횟수 일치: 스파이가 특정 횟수만큼 호출되었는지 테스트:
 
 ```javascript
 test( 'Should call a subscriber and check call counts', function () {
@@ -9863,19 +9863,19 @@ test( 'Should call a subscriber and check call counts', function () {
     PubSub.publishSync( message, 'some payload' );
 
 
-    // Passes if spy was called once and only once.
-    ok( spy.calledOnce ); // calledTwice and calledThrice are also supported
+    // 스파이가 단하번 호출되면 통과
+    ok( spy.calledOnce ); // calledTwice와 calledThrice도 지원된다
 
-    // The number of recorded calls.
+    // 기록된 호출 횟수
     equal( spy.callCount, 1 );
 
-    // Directly checking the arguments of the call
+    // 호출 인자 직접 확인
     equals( spy.getCall(0).args[0], message );
 });
 ```
 
 
-## Stubs and mocks
+## 스텁과 목
 
 SinonJS also supports two other powerful features which are useful to be aware of: stubs and mocks. Both stubs and mocks implement all of the features of the spy API, but have some added functionality.
 
