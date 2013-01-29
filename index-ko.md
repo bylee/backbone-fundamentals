@@ -8433,52 +8433,52 @@ flickly 어플리케이션에는 최소한 모델이 되어야만하는 두개�
 
 ## 소개
 
-One definition of unit testing is the process of taking the smallest piece of testable code in an application, isolating it from the remainder of your codebase and determining if it behaves exactly as expected. In this section, we'll be taking a look at how to unit test Backbone applications using a popular JavaScript testing framework called [Jasmine](http://pivotal.github.com/jasmine/) from Pivotal Labs.
+단위 테스트에 대한 한가지 정의는 어플리케이션에서 테스트할 수 있는 코드의 가장 작은 조각을 가지고 코드의 나머지 부분과 분리하고 그것이 예상대로 동작하는지 결정하는 과정이다. 이 섹션에서, 우리는 Pivotal Labs에서 만든 [Jasmine](http://pivotal.github.com/jasmine/) 이라는 인기있는 자바스크립트 테스트 프레임워크를 사용해서 Backbone 어플리케이션을 테스트하는 방법을 볼 것이다.
 
-For an application to be considered 'well'-tested, distinct functionality should ideally have its own separate unit tests where it's tested against the different conditions you expect it to work under. All tests must pass before functionality is considered 'complete'. This allows developers to both modify a unit of code and its dependencies with a level of confidence about whether these changes have caused any breakage.
+어플리케이션이 '잘' 테스트되었다고 간주되기 위해서 구분되는 기능은 이상적으로 당신이 돌아가리라고 기대되는 다른 조건에 대해 테스트 되는 자신만의 구분된 단위 테스트를 가져야만 한다. 모든 테스트는 기능이 '완성'되었다고 생각되기 전에 통과해야 한다. 이것은 개발자가 이 변경이 어떤 문제도 야기하지 않는다는 신뢰성을 가지고 코드 단위와 의족성 모두를 수정하게 해준다.
 
-As a basic example of unit testing is where a developer may wish to assert whether passing specific values through to a sum function results in the correct output being returned. For an example more relevant to this book, we may wish to assert whether a user adding a new Todo item to a list correctly adds a Model of a specific type to a Todos Collection.
+개발자가 sum 함수에 특정값을 전달하는 것이 옳은 결과가 반환되는지 검증하고 싶어한다고 할 때 단위 테스트의 기본 예제이다. 이 책과 관련된 더 많은 예제에 대해서 우리는 사용자가 새로운 할일 항목을 리스트에 추가한 것이 Todos 컬렉션에 특정 타입의 모델을 올바르게 추가하는지를 검증하고 싶다.
 
-When building modern web-applications, it's typically considered best-practice to include automated unit testing as a part of your development process. Whilst we'll be focusing on Jasmine as a solution for this, there are a number of other alternatives worth considering, including QUnit.
+현대적인 웹 어플리케이션을 만들 때, 일반적으로 자동화된 단위 테스트를 개발 과정의 일부로 포함하는 것이 가장 좋은 사례로 생각되고 있다. 우리가 이에 대한 해결책으로 Jasmine에 관심을 가지고 있는 반면, QUnit을 포함해서 고려할 만한 수많은 대안들이 있다.
 
 ## Jasmine
 
-Jasmine describes itself as a behavior-driven development (BDD) framework for testing JavaScript code. Before we jump into how the framework works, it's useful to understand exactly what [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development) is.
+Jasmine은 자신을 자바스크립트 코드를 위한 행동 주도적인 개발( BDD ) 프레임워크로 묘사한다. 우리는 프레임워크가 어떻게 동작하는지 보기 전에 [BDD](http://en.wikipedia.org/wiki/Behavior_Driven_Development)가 무엇인지 정확히 이해하는 것이 유용하다.
 
-BDD is a second-generation testing approach first described by [Dan North](http://dannorth.net/introducing-bdd/) (the authority on BDD) which attempts to test the behavior of software. It's considered second-generation as it came out of merging ideas from Domain driven design (DDD) and lean software development, helping teams to deliver high quality software by answering many of the more confusing questions early on in the agile process. Such questions commonly include those concerning documentation and testing.
+BDD는 소프트웨어의 동작을 테스트하려는 ( BDD의 저작권자인 ) [Dan North](http://dannorth.net/introducing-bdd/)에 의해 처음으로 언급된 차세대 테스트 방법론이다. 차세대는 어자일 과정에서 초기에 많이 헷갈리는 질문에 답해줌으로써 팀이 고품질의 소프트웨어를 배포하도록 하기 위해 도메인 주도 설계( DDD )와 린 소프트웨어 개발의 개념을 합쳐서 나온 것으로 생각된다. 그런 질문은 문서화와 테스팅에 관련된 것을 포함한다.
 
-If you were to read a book on BDD, it's likely to also be described as being 'outside-in and pull-based'. The reason for this is that it borrows the idea of pulling features from Lean manufacturing which effectively ensures that the right software solutions are being written by a) focusing on expected outputs of the system and b) ensuring these outputs are achieved.
+당신이 만일 BDD에 관한 책을 읽었다면, 'outside-in and pull-based'라는 표현도 좋아할 것이다. 그 이유는 올바른 소프트웨어 솔루션은 a) 시스템의 예상 결과에 집중하고 b) 이 결과를 만들어 냄으로써 작성되도록 하는 린 생산의 pull 특징의 개녕을 빌려온 겄이기 때문이다.
 
-BDD recognizes that there are usually multiple stakeholders in a project and not a single amorphous user of the system. These different groups will be affected by the software being written in differing ways and will have a varying opinion of what quality in the system means to them. It's for this reason that it's important to understand who the software will be bringing value you and exactly what in it will be valuable to them.
+BDD는 보통 프로젝트에 많은 투자자가 있지만 시스템에 비정형적인 한명의 사용자가 없다는 것을 알아차렸다. 이런 다른 그룹들은 다른 방식으로 만들어진 소프트웨어에 영향을 받고 시스템상에서 그들에게 의미있는 품질에 대한 다양한 의견을 가지고 있을 것이다. 소프트웨어가 당신에게 가져다 주는 가치가 무엇이고 언제 그것들이 가치있는지를 이해하는 것이 중요한 이유이다.
 
-Finally, BDD relies on automation. Once you've defined the quality expected, your team will likely want to check on the functionality of the solution being built regularly and compare it to the results they expect. In order to facilitate this efficiently, the process has to be automated. BDD relies heavily on the automation of specification-testing and Jasmine is a tool which can assist with this.
+마지막으로, BDD는 자동화에 의지한다. 당신이 일단 예상되는 품질을 정의하면, 당신 팀은 일반적으로 만들어지는 솔류션의 기능상 확인하고 예상되는 결과와 비교하고 싶을 것이다. 이 것을 효율적으로 지원하기 위해서, 과정은 자동화되어야만 한다. BDD는 명세에 기반한 테스트의 자동화에 매우 의존하며 Jasmine은 이것을 도와주는 툴이다.
 
-BDD helps both developers and non-technical stakeholders:
-
-
-* Better understand and represent the models of the problems being solved
-* Explain supported tests cases in a language that non-developers can read
-* Focus on minimizing translation of the technical code being written and the domain language spoken by the business
-
-What this means is that developers should be able to show Jasmine unit tests to a project stakeholder and (at a high level, thanks to a common vocabulary being used) they'll ideally be able to understand what the code supports.
-
-Developers often implement BDD in unison with another testing paradigm known as [TDD](http://en.wikipedia.org/wiki/Test-driven_development) (test-driven development). The main idea behind TDD is:
-
-* Write unit tests which describe the functionality you would like your code to support
-* Watch these tests fail (as the code to support them hasn't yet been written)
-* Write code to make the tests pass
-* Rinse, repeat and refactor
-
-In this chapter we're going to use both BDD (with TDD) to write unit tests for a Backbone application.
-
-***Note:*** I've seen a lot of developers also opt for writing tests to validate behavior of their code after having written it. While this is fine, note that it can come with pitfalls such as only testing for behavior your code currently supports, rather than behavior the problem needs to be supported.
+BDD는 개발자와  비기술적인 투자자 모두를 도와준다:
 
 
-## Suites, Specs & Spies
+* 풀려는 문제의 모델에 대해 더 잘 이해하고 설명한다
+* 개발자가 아닌 사람이 읽을 수 있는 언어로 지원되는 테스트 케이스를 설명한다
+* 작성된 기술 코드와 비즈니스에서 말하는 업계 용어의 변역을 최소화하는데 집중한다
 
-When using Jasmine, you'll be writing suites and specifications (specs). Suites basically describe scenarios whilst specs describe what can be done in these scenarios.
+이것이 의미하는 것은 개발가가 Jasmine 단위 테스트를 프로젝트 투자자에게 보여줄 수 있고, ( 상위 수준에서 사용되는 일반적인 단어 덕분에 ) 그들은 이상적으로 그 코드가 지원하는 것을 이해할 수 있어야만 한다는 것이다.
 
-Each spec is a JavaScript function, described with a call to ```it()``` using a description string and a function. The description should describe the behaviour the particular unit of code should exhibit and keeping in mind BDD, it should ideally be meaningful. Here's an example of a basic spec:
+개발자는 종종 [TDD](http://en.wikipedia.org/wiki/Test-driven_development)로 알려진 다른 테스트 패러다임과 똑같이 BDD를 구현한다. TDD뒤의 핵심 생각은 다음과 같다:
+
+* 당신 코드가 지원할 것같은 기능을 표현하는 단위 테스트를 작성한다
+* 이 테스트가 실패하는 것을 보아라( 그 기능을 지원하는 코드가 아직 작성되지 않았으니까 )
+* 테스트가 통과하도록 코드를 작성하라.
+* 문제를 해결하고 반복하고 리팩토링해라
+
+이 챕터에서 우리는 Backbone 어플리케이션을 위한 단위 테스트를 작성하기 위해서 BDD( 와 TDD )를 사용할 것이다.
+
+***주의:*** 나는 많은 개발자들이 코드를 작성한 후 코드의 동작을 검증하는 테스트를 작성하는 것을 좋아하기도 하는 것을 알고 있다. 이것도 좋지만, 코드가 문제를 일으킬 수 밖에 없는 동작이 아니라 올바르게 동작하는 것만 테스트하는 위험이 있을 수 있다는 것을 알아둬라.
+
+
+## 스위트, 명세, 그리고 스파이
+
+Jasmine을 사용할 때, 스위트와 명세를 작성할 것이다. 스위트는 기본적으로 시나리오를 표현하는 반면 명세는 이 시나리오에서 행해질 수 있는 것을 표현한다.
+
+각 명세는 자바스크립트 함수인데, 설명 구문과 함수를 사용해서 ```it()```에 대한 호출로 표현된다. 설명은 특정 코드 조각이 BDD를 표현하고 명심하는 동장을 묘사해야만 한다. 그것은 이상적으로 의미있어야만 한다. 특정 코드 단위의 동작을 묘사하는 설명은 표시되기 기억되어야만 한다. 기본 명세의 예제가 여기있다:
 
 ```javascript
 it('should be incrementing in value', function(){
@@ -8487,7 +8487,7 @@ it('should be incrementing in value', function(){
 });
 ```
 
-On its own, a spec isn't particularly useful until expectations are set about the behavior of the code. Expectations in specs are defined using the ```expect()``` function and an [expectation matcher](https://github.com/pivotal/jasmine/wiki/Matchers) (e.g ```toEqual()```, ```toBeTruthy()```, ```toContain()```). A revised example using an expectation matcher would look like:
+코드 동작에 대한 예상이 지정되기 전까지, 명세 그 자체로는 특별히 유용하지 않다. 예상은 ```expect()``` 함수와 [예상 일치기](https://github.com/pivotal/jasmine/wiki/Matchers) ( 예를들어 ```toEqual()```, ```toBeTruthy()```, ```toContain()```)을 사용해서 정의된다. 예상 일치기를 사용한 새로운 예제는 다음과 같다:
 
 ```javascript
 it('should be incrementing in value', function(){
@@ -8497,11 +8497,11 @@ it('should be incrementing in value', function(){
 });
 ```
 
-The above code passes our behavioral expectation as ```counter``` equals 1. Notice how easy this was to read the expectation on the last line (you probably grokked it without any explanation).
+위의 코드는 동작 예상에 ```counter```는 1으로 전달한다. 마지막 줄의 예상을 읽기가 얼마나 쉬운지 보라( 당신은 어떤 설명이 없어도 공감할 것이다 ).
 
-Specs are grouped into suites which we describe using Jasmine's ```describe()``` function, again passing a string as a description and a function. The name/description for your suite is typically that of the component or module you're testing.
+명세는 Jasmine의 ```describe()``` 함수를 사용해서 다시 설명 문자열과 함수를 전달해서 표현하는 대로 스위트로 묶인다. 스위트에 대한 이름이나 설명은 보통 테스트하는 컴포넌트나 모듈에 대한 것이다.
 
-Jasmine will use it as the group name when it reports the results of the specs you've asked it to run. A simple suite containing our sample spec could look like:
+Jasmine은 실행하도록 요청하면 그 명세들의 결과를 보고할 때, 그것을 묶음의 이름으로 사용할 것이다. 예제에 포함된 단순한 스위트는 다음과 같을 것이다:
 
 ```javascript
 describe('Stats', function(){
@@ -8515,31 +8515,31 @@ describe('Stats', function(){
 });
 ```
 
-Suites also share a functional scope and so it's possible to declare variables and functions inside a describe block which are accessible within specs:
+스위트도 함수 범위를 공유하기 때문에 명세에서 접근 가능한 describe 블럿 내에서 변수와 함수를 정의하는 것이 가능하다:
 
 ```javascript
 describe('Stats', function(){
     var counter = 1;
 
     it('can increment a number', function(){
-        // the counter was = 1
+        // counter는 1이다
         counter = counter + 1;
         expect(counter).toEqual(2);
     });
 
     it('can subtract a number', function(){
-        // the counter was = 2
+        // counter는 2이다
         counter = counter - 1;
         expect(counter).toEqual(1);
     });
 });
 ```
 
-***Note:*** Suites are executed in the order in which they are described, which can be useful to know if you would prefer to see test results for specific parts of your application reported first.
+***주의:*** 스위트는 묘사된 순서로 실행된다. 그것은 어플리케이션의 특정 부분이 먼저 표시되도록 테스트 결과를 보고 싶을 때 알아두면 유용하다.
 
-Jasmine also supports **spies** - a way to mock, spy and fake behavior in our unit tests. Spies replace the function they're spying on, allowing us to simulate behavior we would like to mock (i.e test free of the actual implementation).
+Jasmine은 **spies**도 지원한다. - 단위 테스트에서 동작을 가상화하고, 가로채고, 흉내내는 방법. 스파이는 우리가 가상화한 행동을 흉내내는 함수로 바꾸는 것이다( 즉, 실제 구현에 독립적으로 테스트한다 ).
 
-In the below example, we're spying on the ```setComplete``` method of a dummy Todo function to test that arguments can be passed to it as expected.
+아래 예제에서, 우리는 인자가 예상대로 전달되도록 테스트하기 위해 가짜 Todo 함수의 ```setComplete``` 메쏘드를 스파이한다.
 
 ```javascript
 var Todo = function(){
@@ -8566,12 +8566,12 @@ describe('a simple spy', function(){
 });
 ```
 
-What you're more likely to use spies for is testing [asynchronous](http://en.wikipedia.org/wiki/Asynchronous_communication) behavior in your application such as AJAX requests. Jasmine supports:
+당신이 스파이를 사용하고 싶은 것이 AJAX 요청같은 어플리케이션의 [비동기적](http://en.wikipedia.org/wiki/Asynchronous_communication) 동작을 테스트하는 것이다. Jasmine은 다음을 지원한다:
 
-* Writing tests which can mock AJAX requests using spies. This allows us to test code which runs before an AJAX request and right after. It's also possible to mock/fake responses the server can return and the benefit of this type of testing is that it's faster as no real calls are being made to a server
-* Asynchronous tests which don't rely on spies
+* 스파이를 사용해서 AJAX 요청을 가상화하는 테스트를 작성한다. 이것은 우리가 AJAX 요청 전후로 동작하는 코드를 테스트하게 해준다. 반환되는 서버의 응답을 가상화 혹은 속이는 것도 가능하고 이런 종류의 테스트의 장점은 서버로 실제 호출이 없기 때문에 더 빠르다는 것이다.
+* 스파이에 의존하지 않고 비동기적으로 테스트한다.
 
-For the first kind of test, it's possible to both fake an AJAX request and verify that the request was both calling the correct URL and executed a callback where one was provided.
+첫번째 형태의 테스트에서, AJAX 요청을 속이는 것과 올바른 URL을 호출하고 제공된 콜백을 실행하는지를 확인하는 것 모두가 가능하다.
 
 ```javascript
 it('the callback should be executed on success', function () {
@@ -8596,13 +8596,13 @@ function getTodo(id, callback) {
 }
 ```
 
-If you feel lost having seen matchers like ```andCallFake()``` and ```toHaveBeenCalled()```, don't worry. All of these are Spy-specific matchers and are documented on the Jasmine [wiki](https://github.com/pivotal/jasmine/wiki/Spies).
+당신이 ```andCallFake()```와 ```toHaveBeenCalled()``` 같은 일치기를 보기 어렵다면, 걱정하지 마라. 이 모든 것은 스파이 특화된 일치기이고, Jasmine[위키](https://github.com/pivotal/jasmine/wiki/Spies)에 문서화되어 있다.
 
-For the second type of test (asynchronous tests), we can take the above further by taking advantage of three other methods Jasmine supports:
+두번째류의 테스트( 비동기 테스트 )에서, 우리는 위의 장점에 더해 Jasmine이 지원하는 세개의 다른 메쏘드 장점을 가질 수 있다:
 
-* runs(function) - a block which runs as if it was directly called
-* waits(timeout) - a native timeout before the next block is run
-* waitsFor(function, optional message, optional timeout) - a way to pause specs until some other work has completed. Jasmine waits until the supplied function returns true here before it moves on to the next block.
+* runs(function) - 마치 호출되는 것처럼 실행되는 블럭
+* waits(timeout) - 다음 블럭이 실행되기까지의 순수 시간
+* waitsFor(function, optional message, optional timeout) - 다른 작업이 완료될 때까지 명세를 정지시키는 방법. Jasmine은 제공된 함수가 true를 반환할 때까지 다음 블럭으로 가기 전에서 기다린다.
 
 
 ```javascript
@@ -8630,11 +8630,11 @@ function getTodo(id, callback) {
 }
 ```
 
-***Note:*** It's useful to remember that when making real requests to a web server in your unit tests, this has the potential to massively slow down the speed at which tests run (due to many factors including server latency). As this also introduces an external dependency that can (and should) be minimized in your unit testing, it is strongly recommended that you opt for spies to remove the need for a web server to be used here.
+***주의:*** 단위 테스트에서 웹서버로 진짜 요청을 날릴때, 이것은 테스트를 실행할 때의 ( 서버 반응성을 포함해서 많은 요인에 기인해서 ) 큰 속도 저하 가능성이 있다는 것을 기억해 두는 것이 유용하다. 이것이 단위 테스트시 최소화하는 외부 의존성도 도입하기 때문에, 여기에서 사용되는 웹서버가 필요하지 않은 스파이를 선택하길 매우 추천하는 바이다.
 
-## beforeEach and afterEach()
+## beforeEach과 afterEach()
 
-Jasmine also supports specifying code that can be run before each (```beforeEach()```) and after each (```afterEach```) test. This is useful for enforcing consistent conditions (such as resetting variables that may be required by specs). In the following example, ```beforeEach()``` is used to create a new sample Todo model specs can use for testing attributes.
+Jasmine은 또한 각 테스트 전( ```beforeEach()``` )과 후( ```afterEach``` )에 실행될 수 있는 코드를 지정할 수 있도록도 해준다. 이것은 ( 명세에서 필요로 하는 변수들을 초기화하는 것같은 ) 무결한 조건을 유지하는 유용하다. 다음 예제에서, ```beforeEach()```는 명세가 속성을 테스트하는데 사용할 수 있는 새로운 예제 Todo 모델을 생성하는데 사용한다.
 
 ```javascript
 beforeEach(function(){
@@ -8649,24 +8649,24 @@ it('should contain a text value if not the default value', function(){
 });
 ```
 
-Each nested ```describe()``` in your tests can have their own ```beforeEach()``` and ```afterEach()``` methods which support including setup and teardown methods relevant to a particular suite. We'll be using ```beforeEach()``` in practice a little later.
+테스트내의 각 중첩된 ```describe()```는 특정 스위트와 관련된 setup과 teardown 메쏘드를 포함하도록 하는 ```beforeEach()```와 ```afterEach()``` 메쏘드를 가질 수 있다. 우리는 조금 후에 연습에서 ```beforeEach()```를 사용할 것이다.
 
-## Shared scope
+## 공유 범위
 
-In the previous section you may have noticed that we initially declared a variable ```this.todo``` in our ```beforeEach()``` call and were then able to continue using this in ```afterEach()```. This is thanks to a powerful feature of Jasmine known as shared  functional scope. Shared scope allows ```this``` properties to be common to all blocks (including ```runs()```), but not declared variables (i.e ```var```s).
+이전 섹션에서 당신은 ```beforeEach()``` 호출에서 ```this.todo``` 변수를 먼저 선언하고 나서 계속해서 ```afterEach()```에서 이것을 사용할 수 있는 것을 알았다. 이것은 공유된 함수 범위로 알려진 Jasmine의 강력한 기능 덕이다. 공유 범위는 선언된 변수( 즉 ```var``` )들은 아니지만 ```this``` 특성이 ( ```runs()```를 포함한 ) 모든 블럭에 공통적이게 해준다.
 
 
-## Getting setup
+## 설정
 
-Now that we've reviewed some fundamentals, let's go through downloading Jasmine and getting everything setup to write tests.
+이제 우리는 기본을 살펴보았으니 Jasmine을 다운로드해서 테스트를 작성하기 위한 설정을 해보자.
 
-A standalone release of Jasmine can be [downloaded](http://pivotal.github.com/jasmine/download.html) from the official release page.
+ Jasmine의 전체 배포판은 정규 배포 페이지에서 [다운로드](http://pivotal.github.com/jasmine/download.html)할 수 있다.
 
-You'll need a file called SpecRunner.html in addition to the release. It can be downloaded from https://github.com/pivotal/jasmine/tree/master/lib/jasmine-core/example or as part of a download of the complete Jasmine [repo](https://github.com/pivotal/jasmine/zipball/master).Alternatively, you can ```git clone``` the main Jasmine repository from https://github.com/pivotal/jasmine.git.
+당신은 배포에 추가적으로 SpecRunner.html이라고 불리는 파일이 필요할 것이다. 그것은 https://github.com/pivotal/jasmine/tree/master/lib/jasmine-core/example에서 다운로드하거나 전체 Jasmine [저장소](https://github.com/pivotal/jasmine/zipball/master) 다운로드의 일부에서 받을 수 있다. 또 다른 방법으로 당신은 https://github.com/pivotal/jasmine.git에서 Jasmine 저장소를 ```git clone``` 할 수 있다.
 
-Let's review [SpecRunner.html](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/SpecRunner.html):
+[SpecRunner.html](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/SpecRunner.html)를 살펴보자:
 
-It first includes both Jasmine and the necessary CSS required for reporting:
+우선 Jasmine과 결과 보고서를 위해 필요한 CSS를 포함한다:
 
 
 	<link rel="stylesheet" type="text/css" href="lib/jasmine-1.1.0.rc1/jasmine.css"/>
@@ -8674,39 +8674,39 @@ It first includes both Jasmine and the necessary CSS required for reporting:
 	<script type="text/javascript" src="lib/jasmine-1.1.0.rc1/jasmine-html.js"></script>
 
 
-Next, some sample tests are included:
+그 다음으로, 예제 테스트 몇개가 포함된다:
 
 
 	<script type="text/javascript" src="spec/SpecHelper.js"></script>
 	<script type="text/javascript" src="spec/PlayerSpec.js"></script>
 
 
-And finally the sources being tested:
+마지막으로 테스트되는 소스가 있다:
 
 
 	<script type="text/javascript" src="src/Player.js"></script>
 	<script type="text/javascript" src="src/Song.js"></script>
 
 
-***Note:*** Below this section of SpecRunner is code responsible for running the actual tests. Given that we won't be covering modifying this code, I'm going to skip reviewing it. I do however encourage you to take a look through [PlayerSpec.js](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/spec/PlayerSpec.js) and [SpecHelper.js](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/spec/SpecHelper.js). They're a useful basic example to go through how a minimal set of tests might work.
+***주의:*** SpecRunner의 이부분 아래는 실제 테스트를 실행하는 것을 담당하는 코드이다. 우리가 이 코드를 수정하는 것을 다루지 않는다고 가정하고, 살펴보는 것은 건너뛸 것이다. 하지만 나는 당신이 [PlayerSpec.js](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/spec/PlayerSpec.js)와 [SpecHelper.js](https://github.com/pivotal/jasmine/blob/master/lib/jasmine-core/example/spec/SpecHelper.js)를 살펴보길 바란다. 그것들은 최소한의 테스트가 동작하는 방법을 경험하게 해주는 유용한 예제이다.
 
-## TDD With Backbone
+## Backbone에서의 TDD
 
-When developing applications with Backbone, it can be necessary to test both individual modules of code as well as modules, views, collections and routers. Taking a TDD approach to testing, let's review some specs for testing these Backbone components using the popular Backbone [Todo](https://github.com/addyosmani/todomvc/tree/master/todo-example/backbone) application. For this section we will be using a modified version of Larry Myers Backbone Koans project, which can be found in the `practicals\jasmine-koans` folder.
+Backbone으로 어플리케이션을 개발할 때, 각 코드 모듈 뿐만 아니라 모듈, 뷰, 컬렉션, 라우터 모두를 테스트하는 것이 필요할 수도 있다. 테스트에 TDD 접근법을 가지고 유명한 Backbone [Todo](https://github.com/addyosmani/todomvc/tree/master/todo-example/backbone)을 사용해서 이들 Backbone 컴포넌트를 테스트하는 명세 몇개를 살펴보자. 이 섹션을 위해서 우리는 Larry Myers Backbone Koans 프로젝트의 수정된 버젼을 사용할 것인데, 그것은 `practicals\jasmine-koans` 폴더에 있다.
 
-## Models
+## 모델
 
-The complexity of Backbone models can vary greatly depending on what your application is trying to achieve. In the following example, we're going to test default values, attributes, state changes and validation rules.
+Backboine 모델의 복잡도는 당신 어플리케이션이 무슨일을 하는지에 따라 크게 달라진다. 다음 예제에서 우리는 기본값, 속성, 상태 변경 그리고 검증 규칙을 테스트할 것이다.
 
-First, we begin our suite for model testing using ```describe()```:
+우선, ```describe()```을 사용해서 테스트할 모델의 스위트부터 시작하자:
 
 ```javascript
 describe('Tests for Todo', function() {
 ```
 
-Models should ideally have default values for attributes. This helps ensure that when creating instances without a value set for any specific attribute, a default one (e.g '') is used instead. The idea here is to allow your application to interact with models without any unexpected behavior.
+모델은 이상적으로 속성을 위한 기본값을 가져야만 한다. 이것은 특정 속성값들이 없이도 객체를 생성할 때, 대신 기본값( 예를들어 '' )이 사용되게 해준다. 여기에서 아이디어는 어플리케이션이 예상치 못한 동작없이 모델과 상호동작하도록 하는 것이다.
 
-In the following spec, we create a new Todo without any attributes passed then check to find out what the value of the ```text``` attribute is. As no value has been set, we expect a default value of ```''``` to be returned.
+다음 명세에서, 우리는 전달된 어떤 속성없이 새로운 Todo를 생성하고 나서 ```text```의 값이 무엇인지 한번 알아보는 것이다. 어떤 값도 지정하지 않았기 때문에 기본값 ```''```가 반환될 것을 기대한다.
 
 ```javascript
 it('Can be created with default values for its attributes.', function() {
@@ -8715,7 +8715,7 @@ it('Can be created with default values for its attributes.', function() {
 });
 ```
 
-If testing this spec before your models have been written, you'll incur a failing test, as expected. What's required for the spec to pass is a default value for the attribute ```text```. We can implement this default value with some other useful defaults (which we'll be using shortly) in our Todo model as follows:
+모델이 작성되기 전에 이 명세를 테스트한다면, 예상한대로 테스트 실패를 초래할 것이다. 명세가 통과하기 위해 필요한 것은 ```text``` 속성에 대한 기본값이다. 우리는 다음과 같이 Todo 모델안에서 ( 간단히 사용할 ) default로 기본값을 구현할 수 있다:
 
 ```javascript
 
@@ -8729,14 +8729,14 @@ window.Todo = Backbone.Model.extend({
 
 ```
 
-Next, we want to test that our model will pass attributes that are set such that retrieving the value of these attributes after initialization will be what we expect. Notice that here, in addition to testing for an expected value for ```text```, we're also testing the other default values are what we expect them to be.
+다음으로, 초기화 후에 이들 속성값을 가져온 내용이 우리가 예상한 내용인 것과 같이 우리는 모델이 지정한 속성을 전달할지 테스트하고 싶다. 여기에서 ```text```에 대한 예상값에 대한 테스트에 추가해서 우리는 다른 기본값도 우리가 예상하던 값인지 테스트도 한다.
 
 ```javascript
 it('Will set passed attributes on the model instance when created.', function() {
     var todo = new Todo({ text: 'Get oil change for car.' });
 
-    // what are the values expected here for each of the
-    // attributes in our Todo?
+    // 우리 Todo에 각 속성에 대해 여기에서 
+    // 예상되는 값이 무엇인가?
 
     expect(todo.get('text')).toBe('Get oil change for car.'');
     expect(todo.get('done')).toBe(false);
@@ -8744,7 +8744,7 @@ it('Will set passed attributes on the model instance when created.', function() 
 });
 ```
 
-Backbone models support a model.change() event which is triggered when the state of a model changes. In the following example, by 'state' I'm referring to the value of a Todo model's attributes. The reason changes of state are important to test are that there may be state-dependent events in your application e.g you may wish to display a confirmation view once a Todo model has been updated.
+Backbone 모델은 모델의 상태가 변할 때, 구동되는 model.change() 이벤트를 지원한다. 다음 예제에서 `state`에 의해서 Todo 모델의 속성값을 참조한다. 테스트하는데 상태를 변경이 중요한 이유는 어플리케이션에 상태 의존적인 이벤트가 있을지도 모르게 때문이다. 예를들어 Todo 모델이 갱신되면, 확인창을 보여주고 싶을 수도 있다.
 
 ```javascript
 it('Fires a custom event when the state changes.', function() {
@@ -8753,21 +8753,21 @@ it('Fires a custom event when the state changes.', function() {
 
     var todo = new Todo();
 
-    // how do we monitor changes of state?
+    // 상태 변경을 감시하기 위해 어떻게 해야하는가?
     todo.on('change', spy);
 
-    // what would you need to do to force a change of state?
+    // 강제로 상태를 변경하기 위해 무엇이 필요한가?
     todo.set({ text: 'Get oil change for car.' });
 
     expect(spy).toHaveBeenCalled();
 });
 ```
 
-It's common to include validation logic in your models to ensure both the input passed from users (and other modules) in the application are 'valid'. A Todo app may wish to validate the text input supplied in case it contains rude words. Similarly if we're storing the ```done``` state of a Todo item using booleans, we need to validate that truthy/falsy values are passed and not just any arbitrary string.
+어플리케이션에서 사용자( 그리고 다른 모듈 )가 전달한 입력이 '올바른지' 확인하기 위해 모델에 검증 로직을 포함하는 것이 일반적이다. Todo 앱은 무례한 단어가 포함된 경우인지 제공된 문자 입력을 검증하고 싶을지도 모른다. 유사하게 우리가 논리값을 사용해서 Todo 항목의 ```done``` 상태를 저장하면 우리는 임의의 문자열이 아닌 참/거짓 값이 전달되었는지 검증해야만 한다.
 
-In the following spec, we take advantage of the fact that validations which fail model.validate() trigger an "error" event. This allows us to test if validations are correctly failing when invalid input is supplied.
+다음 명세에서, model.validate()를 실패한 검증이 "error" 이벤트를 구동한다는 사실에 장점이 있다. 이것은 올바르지 않은 입력이 들어왔을 때, 정상적으로 검증이 실패하는지를 테스트하게 해준다.
 
-We create an errorCallback spy using Jasmine's built in ```createSpy()``` method which allows us to spy on the error event as follows:
+우리는 다음과 같이 Jasmine의 내장 함수 ```createSpy()```를 사용해서 error 이벤트를 흉내내게하는 errorCallback 스파이를 만든다:
 
 ```javascript
 it('Can contain custom validation rules, and will trigger an error event on failed validation.', function() {
@@ -8778,8 +8778,8 @@ it('Can contain custom validation rules, and will trigger an error event on fail
 
     todo.on('error', errorCallback);
 
-    // What would you need to set on the todo properties to
-    // cause validation to fail?
+    // 검증을 실패하기 위해 할일 특성에 
+    // 무엇을 설정해야만 하는가?
 
     todo.set({done:'a non-integer value'});
 
@@ -8792,7 +8792,7 @@ it('Can contain custom validation rules, and will trigger an error event on fail
 
 ```
 
-The code to make the above failing test support validation is relatively simple. In our model, we override the validate() method (as recommended in the Backbone docs), checking to make sure a model both has a 'done' property and is a valid boolean before allowing it to pass.
+위에서 실패한 테스트가 검증을 지원하도록 하는 코드는 상대적으로 간단하다. 모델에 전달하기 전에 'done' 특성을 가지고 있고 올바른 논리값인지 확인하기 위해서, 우리는 ( Backbone 문서에서 추전한 대로 ) 모델의 validate() 메쏘드를 다시 쓴다.
 
 ```javascript
 validate: function(attrs) {
@@ -8802,7 +8802,7 @@ validate: function(attrs) {
 }
 ```
 
-If you would like to review the final code for our Todo model, you can find it below:
+우리가 Todo 메쏘드의 최종 코드를 살펴보고 싶으면 아래에서 찾을 수 있다:
 
 ```javascript
 var NAUGHTY_WORDS = /crap|poop|hell|frogs/gi;
@@ -8837,19 +8837,19 @@ window.Todo = Backbone.Model.extend({
 ```
 
 
-## Collections
+## 컬렉션
 
-We now need to define specs to tests a Backbone collection of Todo models (a TodoList). Collections are responsible for a number of list tasks including managing order and filtering.
+이제 우리는 Todo 모델에 대한 Backbone 컬렉션( TodoList )를 테스트하는 명세를 정의해야만 한다. 컬렉션은 순서와 필터링 관리를 포함한 일들을 처리하는 많은 목록에 관한 것이다.
 
-A few specific specs that come to mind when working with collections are:
+컬렉션을 다룰 때 기억해야하는 몇가지 특별한 명세는 다음과 같다:
 
-* Making sure we can add new Todo models as both objects and arrays
-* Attribute testing to make sure attributes such as the base URL of the collection are values we expect
-* Purposefully adding items with a status of ```done:true``` and checking against how many items the collection thinks have been completed vs. those that are remaining
+* 우리가 객체와 배열 모두로 새로운 Todo 모델을 추가할 수 있는지 여부
+* 컬렉션의 기본 URL이 우리가 예상하는 값인지 같은 속성을 확인하는 속성 테스트
+* ```done:true``` 상태의 항목을 의도적으로 추가하고 컬렉션에서 몇개의 항목이 완료되고 또 남아있는지 확인하기
 
-In this section we're going to cover the first two of these with the third left as an extended exercise I recommend trying out.
+이 섹션에서 우리는 첫 두개를 다루고 세번쩨는 한번 해 볼 심화 연습으로 남겨두겠다.
 
-Testing Todo models can be added to a collection as objects or arrays is relatively trivial. First, we initialize a new TodoList collection and check to make sure its length (i.e the number of Todo models it contains) is 0. Next, we add new Todos, both as objects and arrays, checking the length property of the collection at each stage to ensure the overall count is what we expect:
+Todo 모델이 컬렉션에 객체나 배열로 추가되는 것을 테스트하는 것은 상대적으로 사소하다. 우선 우리는 새로운 TodoList 컬렉션을 초기화하고 그 길이( 즉 포함된 Todo 모델의 수 )가 0인지 확인한다. 그리고 나서 우리는 전체 갯수가 우리가 예상한대로 하기 위해 각 단계에서 컬렉션의 길이을 확인하면서 객체와 배열 모두 새로운 Todo들을 추가한다:
 
 ```javascript
 describe('Tests for TodoList', function() {
@@ -8861,7 +8861,7 @@ describe('Tests for TodoList', function() {
 
         todos.add({ text: 'Clean the kitchen' });
 
-        // how many todos have been added so far?
+        // 여기에서 몇개의 할일이 추가되어야 하는가?
         expect(todos.length).toBe(1);
 
         todos.add([
@@ -8869,27 +8869,27 @@ describe('Tests for TodoList', function() {
             { text: 'Go to the gym'}
         ]);
 
-        // how many are there in total now?
+        // 이제 전체 몇개가 있을까?
         expect(todos.length).toBe(3);
     });
 ...
 ```
 
-Similar to model attributes, it's also quite straight-forward to test attributes in collections. Here we have a spec that ensures the collection.url (i.e the url reference to the collection's location on the server) is what we expect it to be:
+모델의 속성과 유사하게 컬렉션의 속성을 테스트하는 것도 간단하다. 여기에서 우리는 collection.url( 즉, 서버상에서 컬렉션의 위치를 참조하는 url ) 이 우리가 예상하는 것인지 확인하는 명세를 가진다:
 
 ```javascript
 it('Can have a url property to define the basic url structure for all contained models.', function() {
         var todos = new TodoList();
 
-        // what has been specified as the url base in our model?
+        // 모델에 기본 URL을 어떻게 지정되었는가?
         expect(todos.url).toBe('/todos/');
 });
 
 ```
 
-For the third spec, it's useful to remember that the implementation for our collection will have methods for filtering how many Todo items are done and how many are remaining - we can call these ```done()``` and ```remaining()```. Consider writing a spec which creates a new collection and adds one new model that has a preset ```done``` state of ```true``` and two others that have the default ```done``` state of ```false```. Testing the length of what's returned using ```done()``` and ```remaining()``` should allow us to know whether the state management in our application is working or needs a little tweaking.
+세번째 명세를 위해서, 컬렉션을 위한 구현이 얼마나 많은 Todo 항목들이 완료되었는지, 남아있는지를 필터링하는 메쏘드를 가지고 있는 것을 기억하는 것이 유용하다 - 우리는 이들 ```done()```과 ```remaining()```을 호출할 수 있다. 새로운 컬렉션을 생성하고 미리 ```done```을 상태를 ```true```로 가진 모델 하나와 기본 ```done``` 상태가 ```false```인 다른 두개를 추가하는 명세를 작성한다고 생각해라. ```done()```과 ```remainging()```을 사용해서 반환된 것의 길이를 테스트하는 것은 우리가 어플리케이션에서의 상태 관리가 잘 동작하는지 아니면 조금 고쳐야 하는지를 알게 해준다.
 
-The final implementation for our TodoList collection can be found below:
+TodoList 컬렉션의 최종 구현은 아래와 같다:
 
 
 ```javascript
@@ -8923,44 +8923,44 @@ The final implementation for our TodoList collection can be found below:
 ```
 
 
-## Views
+## 뷰
 
-Before we take a look at testing Backbone views, let's briefly review a jQuery plugin that can assist with writing Jasmine specs for them.
+Backbone 뷰를 테스트하는 것을 보기 전에, 그것들에 대한 Jasmine 명세를 작성하도록 도와주는 jQuery 플러그인을 간단히 살펴보자.
 
-**The Jasmine jQuery Plugin**
+**Jasmine jQuery 플러그인**
 
-As we know our Todo application will be using jQuery for DOM manipulation, there's a useful jQuery plugin called [jasmine-jquery](https://github.com/velesin/jasmine-jquery) we can use to help simplify BDD testing rendered elements that our views may produce.
+Todo 어플리케이션이 DOM 조작에 jQuery를 사용하고 있다고 알고 있기 때문에, 뷰가 생성하는 렌러링 요소를 BDD 테스팅하는 것을 단순화하도록 도와주는 [jasmine-jquery](https://github.com/velesin/jasmine-jquery)라는 유용한 jQuery 플러그인이 있다.
 
-The plugin provides a number of additional Jasmine [matchers](https://github.com/pivotal/jasmine/wiki/Matchers) to help test jQuery wrapped sets such as:
+플러그인은 다음과 같은 jQuery로 감싼 것들을 테스트하는데 도움이 되는 많은 추가적인Jasmine [일치기](https://github.com/pivotal/jasmine/wiki/Matchers)를 제공한다:
 
-* ```toBe(jQuerySelector)``` e.g ```expect($('<div id="some-id"></div>')).toBe('div#some-id')```
-* ```toBeChecked()``` e.g ```expect($('<input type="checkbox" checked="checked"/>')).toBeChecked()```
-* ```toBeSelected()``` e.g ```expect($('<option selected="selected"></option>')).toBeSelected()```
+* ```toBe(jQuerySelector)``` 예제 ```expect($('<div id="some-id"></div>')).toBe('div#some-id')```
+* ```toBeChecked()``` 예제 ```expect($('<input type="checkbox" checked="checked"/>')).toBeChecked()```
+* ```toBeSelected()``` 예제 ```expect($('<option selected="selected"></option>')).toBeSelected()```
 
-and [many others](https://github.com/velesin/jasmine-jquery). The complete list of matchers supported can be found on the project homepage. It's useful to know that similar to the standard Jasmine matchers, the custom matchers above can be inverted using the .not prefix (i.e ```expect(x).not.toBe(y)```):
+그리고 [다른 것](https://github.com/velesin/jasmine-jquery)도 많이 있다. 지원되는 일치기의 전체 목록은 프로젝트 홈페이지에서 찾을 수 있다. 표준 Jasmine 일치기와 유사하게 위의 사용자 정의 일치기는 .not 접두사를 사용해서 반전시킬 수 있는 것( 즉 ```expect(x).not.toBe(y)``` )을 알아두는 것도 유용하다:
 
 ```javascript
 expect($('<div>I am an example</div>')).not.toHaveText(/other/)
 ```
 
-jasmine-jquery also includes a fixtures model, allowing us to load in arbitrary HTML content we may wish to use in our tests. Fixtures can be used as follows:
+jasmine-jquery도 우리가 테스트에서 사용하고 싶은 임의의 HTML 내용으로 로드하도록 하기위해 픽스쳐 모델을 포함한다. 픽스쳐는 다음과 같이 사용한다:
 
-Include some HTML in an external fixtures file:
+외부 픽스쳐 파일에 약간의 HTML을 포함한다:
 
 some.fixture.html:
 ```<div id="sample-fixture">some HTML content</div>```
 
-Next, inside our actual test we would load it as follows:
+다음으로 실제 테스트안에서 다음과 갆이 그것을 로드한다:
 
 ```javascript
 loadFixtures('some.fixture.html')
 $('some-fixture').myTestedPlugin();
-expect($('#some-fixture')).to<the rest of your matcher would go here>
+expect($('#some-fixture')).to<일치기의 나머지가 여기 들어간다>
 ```
 
-The jasmine-jquery plugin is by default setup to load fixtures from a specific directory: spec/javascripts/fixtures. If you wish to configure this path you can do so by initially setting ```jasmine.getFixtures().fixturesPath = 'your custom path'```.
+jasmine-jquery 플러그인은 기본적으로 특정 디렉토리로부터 픽스쳐를 로드한다: spec/javascripts/fixtures. 만일 이 경로를 바꾸고 싶으면, 처음에 ```jasmine.getFixtures().fixturesPath = 'your custom path'```를 지정함으로써 가능하다.
 
-Finally, jasmine-jquery includes support for spying on jQuery events without the need for any extra plumbing work. This can be done using the ```spyOnEvent()``` and ```assert(eventName).toHaveBeenTriggered(selector)``` functions. An example of usage may look as follows:
+마지막으로, jasmine-jquery는 다른 부수적인 작업을 할 필요없이 jQuery 이벤트를 가로채는 것을 지원한다. 이것은 ```spyOnEvent()```와 ```assert(eventName).toHaveBeenTriggered(selector)``` 함수를 사용해서 할 수 있다. 사용 예제는 다음과 같다:
 
 ```javascript
 spyOnEvent($('#el'), 'click');
@@ -8968,15 +8968,15 @@ $('#el').click();
 expect('click').toHaveBeenTriggeredOn($('#el'));
 ```
 
-**View testing**
+**뷰 테스트**
 
-In this section we will review three dimensions to writing specs for Backbone Views: initial setup, view rendering and finally templating. The latter two of these are the most commonly tested, however we'll review shortly why writing specs for the initialization of your views can also be of benefit.
+이번 섹션에서 우리는 Backbone 뷰에 대해 명세를 작성하는 세가지 방법을 볼 것이다: 초기 설정, 뷰 렌더링 그리고 마지막으로 템플릿팅. 후자의 두개는 가장 일반적으로 테스트되지만 왜 뷰 초기화에 대한 명세를 작성하는 것도 장점이 되는지 간단히 알아볼 것이다.
 
-## Initial setup
+## 초기 설정
 
-At their most basic, specs for Backbone views should validate that they are being correctly tied to specific DOM elements and are backed by valid data models. The reason to consider doing this is that failures to such specs can trip up more complex tests later on and they're fairly simple to write, given the overall value offered.
+가장 기본적으로 Backbone 뷰에 대한 명세는 특정 DOM 요소와 올바르게 결합되었는지와 올바른 데이타 모델을 가졌는지를 검증해야만 한다. 이렇게 해야한다고 생각하는 이유는 그런 명세의 실패가 나중에 더 복잡한 테스트를 실패할 수 있고, 전체 값이 제공되면 작성하는 것도 쉽기 때문이다.
 
-To help ensure a consistent testing setup for our specs, we use ```beforeEach()``` to append both an empty ```UL``` (#todoList) to the DOM and initialize a new instance of a TodoView using an empty Todo model. ```afterEach()``` is used to remove the previous #todoList  ```UL``` as well as the previous instance of the view.
+명세를 위해서 일관된 테스트 설정을 하기 위해, 우리는 DOM에 빈 ```UL```( #todoList )을 추가하고 빈 Todo 모델을 사용해서 새로운  TovoView 객체를 초기화하는 ```beforeEach()```를 사용한다. ```afterEach()```는 이전의 #todoList ```UL``` 뿐만 아니라 이전의 뷰도 제거하는데 사용된다.
 
 ```javascript
 describe('Tests for TodoView', function() {
@@ -8995,9 +8995,9 @@ describe('Tests for TodoView', function() {
 ...
 ```
 
-The first spec useful to write is a check that the TodoView we've created is using the correct ```tagName``` (element or className). The purpose of this test is to make sure it's been correctly tied to a DOM element when it was created.
+작성하는 유용한 첫번째 명세는 생성한 TodoView가 올바른 ```tagName```( 요소 또는 className )을 사용하고 있는지 확인하는 것이다. 이 테스트의 목적은 생성되었을 때, DOM 요소에 올바르게 결합되었는지 확인하는 것이다.
 
-Backbone views typically create empty DOM elements once initialized, however these elements are not attached to the visible DOM in order to allow them to be constructed without an impact on the performance of rendering.
+Backbone 뷰는 일반적으로 초기화되면 빈 DOM 요소를 생성하지만 렌더링 성능에 문제없이 생성되기 위효 이 요소들을 가시적인 DOM에 결합되어 있지 않다.
 
 ```javascript
 it('Should be tied to a DOM element when created, based off the property provided.', function() {
@@ -9006,7 +9006,7 @@ it('Should be tied to a DOM element when created, based off the property provide
 });
 ```
 
-Once again, if the TodoView has not already been written, we will experience failing specs. Thankfully, solving this is as simple as creating a new Backbone.View with a specific ```tagName```.
+또다시, TodoView가 이미 작성되어 있지 않다면 명세를 실패하는 것을 볼 것이다. 감사하게도, 이것을 해결하는 것은 단순히 특정 ```tagName```을 가진 Backbone 뷰를 생성하는 것이다.
 
 ```javascript
 var todoView = Backbone.View.extend({
@@ -9014,7 +9014,7 @@ var todoView = Backbone.View.extend({
 });
 ```
 
-If instead of testing against the ```tagName``` you would prefer to use a className instead, we can take advantage of jasmine-jquery's ```toHaveClass()``` matcher to cater for this.
+```tagName```에 대한 테스트 대신에 className을 사용하고 싶으면, 이것을 제공하는 jasmin-jquery의 ```toHaveClass()``` 일치기를 이용할 수 있다.
 
 ```
 it('Should have a class of "todos"'), function(){
@@ -9022,30 +9022,30 @@ it('Should have a class of "todos"'), function(){
 });
 ```
 
-The ```toHaveClass()``` matcher operates on jQuery objects and if the plugin hadn't been used, an exception would have been incurred (it is of course also possible to test for the className by accessing el.className if not opting to use jasmine-jquery).
+```toHaveClass()``` 일치기는 jQuery 객체에 대해 동작하고 플러그인이 사용되지 않으면 예외가 발생할 것이다.( 물론 jasmine-jquery를 사용하고 싶지 않으면 el.className에 접근해서 className을 테스트할 수도 있다 ).
 
-You may have noticed that in ```beforeEach()```, we passed our view an initial (albeit unfilled) Todo model. Views should be backed by a model instance which provides data. As this is quite important to our view's ability to function, we can write a spec to ensure a model is both defined (using the ```toBeDefined()``` matcher) and then test attributes of the model to ensure defaults both exist and are the value we expect them to be.
+당신은 ```beforeEach()```에서 우리가 초기( 아무것도 없지만 ) Todo 모델에 뷰를 전달하는 것을 볼 것이다. 뷰는 데이타를 제공하는 모델 객체의 지원을 받는다. 이것은 동작하는 뷰에게 매우 중요하기 때문에, 우리는 모델이 ( ```toBeDefined()``` 일치기를 사용해서 ) 모두 정의되었는지 확인하고 모델의 속성이 기본값이 있고 예상대로인지 확인하는 명세를 작성할ㄹ 수 있다.
 
 ```javascript
 it('Is backed by a model instance, which provides the data.', function() {
 
     expect(todoView.model).toBeDefined();
 
-    // what's the value for Todo.get('done') here?
-    expect(todoView.model.get('done')).toBe(false); //or toBeFalsy()
+    // 여기에서 Todo.get('done') 의 값은 무엇인가?
+    expect(todoView.model.get('done')).toBe(false); // 혹은 toBeFalsy()
 });
 ```
 
-## View rendering
+## 뷰 렌더링
 
 
-Next we're going to take a look at writing specs for view rendering. Specifically, we want to test that our TodoView elements are actually rendering as expected.
+다음으로 우리는 뷰 렌더링에 대한 명세를 작성하는 것을 볼 것이다. 특히, 우리는 TodoView 요소가 실제로 예상하는 대로 렌더링되는지 테스트하고 싶다.
 
-In smaller applications, those new to BDD might argue that visual confirmation of view rendering could replace unit testing of views. The reality is that when dealing with applications that might grow to multiple-views, it often makes sense to automate this process as much as possible from the get-go. There are also aspects of rendering that require verification beyond what is visually presented on-screen (which we'll see very shortly).
+작은 어플리케이션에서, BDD가 처음인 사람들은 뷰 렌더링을 눈으로 확인하는 것이 뷰의 단위 테스트를 대체할 수 있다고 말한다. 현실은 여러 개 뷰로 커진 어플리케이션을 다룰 때, 종종 최초부터 가능한 이과정을 자동화하는 것이 상식적이다. 화면에 가시적으로 존재하는 것 이상으로 확인이 필요한 렌더링 관점도 있다( 간단히 알아볼 것이다 ).
 
-We're going to begin testing views by writing two specs. The first spec will check that the view's ```render()``` method is correctly returning the view instance, which is necessary for chaining. Our second spec will check that the HTML produced is exactly what we expect based on the properties of the model instance that's been associated with our TodoView.
+우리는 두개의 명세를 작성함으로써 뷰 테스트를 시작할 것이다. 천번째 명세는 뷰의 ```render()``` 메쏘드가 뷰 객체를 올바르게 반환하는지를 확인할 것인데, 그것은 체이닝을 위해 필요하다. 두번째 명세는 생성된 HTML이 정확히 TodoView와 연결된 모델 객체의 특성에 따라 우리가 생각한 대로 인지 확인할 것이다.
 
-Unlike some of the previous specs we've covered, this section will make greater use of ```beforeEach()``` to both demonstrate how to use nested suites and also ensure a consistent set of conditions for our specs. In our first view spec for TodoView, we're simply going to create a sample model (based on Todo) and instantiate a TodoView which associates it with the model.
+우리가 다룬 이전 명세와 달리, 이 섹션은 중첩 스위트를 사용하는 방법을 보여주고, 명세에 대한 조건들을 일관성있게 하기 위해 ```beforeEach()```를 더 많이 사용할 것이다. TodoView에 대한 첫번째 뷰 명세에서 우리는 단순히 ( Todo에 기반한 ) 예제 모델을 생성하고 그 모델과 연결된 TodoView를 객체화할 것이다.
 
 ```javascript
 describe('TodoView', function() {
@@ -9068,8 +9068,8 @@ describe('TodoView', function() {
     it('produces the correct HTML', function() {
       this.view.render();
 
-      //let's use jasmine-jquery's toContain() to avoid
-      //testing for the complete content of a todo's markup
+      // 할일의 마크업의 전체 내용을 테스트하지 않기 위해서
+      // jasmine-jquery의 toContain()을 사용하자
       expect(this.view.el.innerHTML)
         .toContain('<label class="todo-content">My Todo</label>');
     });
@@ -9080,9 +9080,9 @@ describe('TodoView', function() {
 ```
 
 
-Once these specs are run, only the second one ('produces the correct HTML') fails. Our first spec ('returns the view object'), which is testing that the TodoView instance is returned from ```render()```, only passed as this is Backbone's default behavior. We haven't yet overwritten the ```render()``` method with our own version.
+이 명세를 실행하면, 두번째 것('produces the correct HTML')만 실패한다. 첫번째 명세('returns the view object')는 Backbone의 기본 동작으로 통과한다, 그것은 TodoView 객체가 ```render```에서 반환되는지 테스트한다. 우리는 아직 직접 ```render()``` 메쏘드를 덮어쓰지 않았다.
 
-**Note:** For the purposes of maintaining readability, all template examples in this section will use a minimal version of the following Todo view template. As it's relatively trivial to expand this, please feel free to refer to this sample if needed:
+**주의:** 가독성을 유지하기 위한 목적으로 이 섹션의 모든 템플릿 예제는 다음 Todo 뷰 템플릿의 최소 버젼을 사용할 것이다. 이것을 확장하는 것은 사소한 것이기 때문에, 필요하면 이 예제를 편하게 참고해라:
 
 
 
@@ -9099,11 +9099,11 @@ Once these specs are run, only the second one ('produces the correct HTML') fail
 
 
 
-The second spec fails with the following message:
+두번째 명세는 다음 문장과 함께 실패한다:
 
 ```Expected '' to contain '<label class="todo-content">My Todo</label>'.```
 
-The reason for this is the default behavior for render() doesn't create any markup. Let's write a replacement for render() which fixes this:
+이 이유는 render()의 기본 동작이 마크업을 생성하지 않기 때문이다. 이것을 고치는 render()를 바꿔 작성하자:
 
 ```javascript
 render: function() {
@@ -9115,9 +9115,9 @@ render: function() {
 }
 ```
 
-The above specifies an inline string template and replaces fields found in the template within the "<% %>" blocks with their corresponding values from the associated model. As we're now also returning the TodoView instance from the method, the first spec will also pass. It's worth noting that there are serious drawbacks to using HTML strings in your specs to test against like this. Even minor changes to your template (a simple tab or whitespace) would cause your spec to fail, despite the rendered output being the same. It's also more time consuming to maintain as most templates in real-world applications are significantly more complex. A better option for testing rendered output is using jQuery to both select and inspect values.
+위의 코드는 내장된 문자열 템플릿을 지정하고 템플릿내에 있는 "<% %>" 블럭을 가진 항목을 관련 모델의 대응되는 값으로 대체한다. 우리는 그 메쏘드에서 TodoView 객체를 반환도 하기 때문에 첫번째 명세도 통과할 것이다. 이런 테스트 명세에는 HTML 문자열을 사용하는 중요한 결함이 있다는 것을 알아둘 필요가 있다. 템플릿의 작은 변화( 단순한 탭이나 공백 )가 렌더링된 결과가 같을 지라도 명세를 실패하게 한다. 실제 어플리케이션의 대부분의 템플릿은 훨씬 복잡하기 때문에 유지하는데 더 많은 시간이 든다. 렌더링된 결과를 테스트하는 더 좋은 선택은 값을 얻어오고 살펴보는데 jQuery를 사용하는 것이다.
 
-With this in mind, let's re-write the specs, this time using some of the custom matchers offered by jasmine-jquery:
+이것을 마음에 두고 이번에는 jasmine-jquery가 제공하는 사용자 정의 일치기를 사용해서 명세를 다시 작성하자:
 
 
 ```javascript
@@ -9136,9 +9136,9 @@ describe('Template', function() {
 ```
 
 
-It would be impossible to discuss unit testing without mentioning fixtures. Fixtures typically contain test data (e.g HTML) that is loaded in when needed (either locally or from an external file) for unit testing. So far we've been establishing jQuery expectations based on the view's el property. This works for a number of cases, however, there are instances where it may be necessary to render markup into the document. The most optimal way to handle this within specs is through using fixtures (another feature brought to us by the jasmine-jquery plugin).
+픽스쳐를 언급하지 않고 단위 테스트를 논의하는 것은 불가능하다. 픽스쳐는 일반적으로 단위 테스트에 필요할 때( 안에 있든 외부 파일에 있든 ) 로드되는 ( HTML같은 ) 테스트 데이타를 포함하고 있다. 지금까지 우리는 뷰의 el특성에 기반해서 jQuery 예상을 만들었다. 이것은 많은 경우에 잘 돌아가지만, 마크업을 문서로 렌더링할야만 하는 객체들이 있다. 명세에서 이것을 다루는 가장 최상의 방법은 ( jasmine-jquery 플러그인이 우리에게 주는 또 하나의 기능인 )픽스쳐를 사용하는 것이다.
 
-Re-writing the last spec to use fixtures would look as follows:
+픽스쳐를 사용하는 최종 명세를 다시 만든다:
 
 
 ```javascript
@@ -9167,15 +9167,15 @@ describe('TodoView', function() {
 });
 ```
 
-What we're now doing in the above spec is appending the rendered todo item into the fixture. We then set expectations against the fixture, which may be something desirable when a view is setup against an element which already exists in the DOM. It would be necessary to provide both the fixture and test the ```el``` property correctly picking up the element expected when the view is instantiated.
+위의 명세에서 우리가 한 것은 렌더링된 할일 항목을 픽스쳐에 추가하는 것이다. 그리고나서 우리는 픽스쳐에 대한 예상을 설정했는데, 픽스쳐는 DOM에 이미 존재하는 요소에 뷰를 설정할 때 원하는 어떤 것이다. 픽스쳐를 제공하고 뷰가 객체화될 때 예상되는 요소를 정확히 가져간 ```el``` 특성을 확인하는 것이 필요하다.
 
 
-## Rendering with a templating system
+## 템플릿팅 시스템으로 렌더링하기
 
 
-JavaScript templating systems (such as Handlebars, Mustache and even Underscore's own Micro-templating) support conditional logic in template strings. What this effectively means is that we can add if/else/ternery expressions inline which can then be evaluated as needed, allowing us to build even more powerful templates.
+(Handlebars, Mustache, 그리고 Underscore 자체 마이크로 템플릿팅같은 ) 자바스크립트 템플릿팅 시스템은 템플릿 문자열 안에서 조건 로직을 지원한다. 우리가 필요에 따라 계산할 수 있는 if / else / ternery 표현식을 추가할 수 있다는 것이 의미하는 것은 효과적으로 더 강력한 템플릿을 만들 수 있다는 것이다.
 
-In our case, when a user sets a Todo item to be complete (done), we may wish to provide them with visual feedback (such as a striked line through the text) to differentiate the item from those that are remaining. This can be done by attaching a new class to the item. Let's begin by writing a test we would ideally like to work:
+우리의 경우, 사용자가 Todo 항목이 완료( 다했음 )되었다고 지정했을 때, 우리는 진행중인 항목들과 달라졌다고 ( 문자 중간에 줄긋는 것같은 ) 가시적인 피드백을 주고 싶다. 이것은 아이템에 새로운 클래스를 붙이면 된다. 잘 동작하는 테스트 작성을 시작해보자:
 
 
 ```javascript
@@ -9194,13 +9194,13 @@ describe('When a todo is done', function() {
 });
 ```
 
-This will fail with the following message:
+다음과 같은 문장과 함께 실패할 것이다:
 
 ```Expected '<label class="todo-content">My Todo</label>'
 to have class 'done'.
 ```
 
-which can be fixed in the existing render() method as follows:
+그것은 다음과 같이 존재하는 render() 메쏘드를 고쳐서 해결할 수 있다:
 
 
 ```javascript
@@ -9218,9 +9218,9 @@ render: function() {
 ```
 
 
-This can however get unwieldily fairly quickly. As the logic in our templates increases, so does the complexity involved. This is where templates libraries can help. As mentioned earlier, there are a number of popular options available, but for the purposes of this chapter we're going to stick to using Underscore's built-in Microtemplating. Whilst there are more advanced options you're free to explore, the benefit of this is that no additional files are required and we can easily change the existing Jasmine specs without too much adjustment.
+그러나 이건을 이상하리만큼 너무 쉽다. 템플릿에 로직이 증가함에 따라, 관련된 복잡도도 그러하다. 이것이 템플릿 라이브러리가 할 수 있는 것이다. 이전에 언급했듯이 사용할만한 많은 선택이 있지만 이 챕터의 목적에 맞게 Underscore의 내장 마이크로 템플릿팅을 사용할 것이다. 자유롭게 살펴볼만하 더 진보적인 선택들이 있는 반면, 이것의 장점은 추가적인 파일이 필요가 없고 많은 수정없이 Jasmine 명세를 쉽게 변경할 수 있다는 것이다.
 
-The TodoView object modified to use Underscore templating would look as follows:
+수정된 TodoView 객체는 다음과 같이 Underscore 템플릿팅을 사용한다:
 
 ```javascript
 var TodoView = Backbone.View.extend({
@@ -9242,9 +9242,9 @@ var TodoView = Backbone.View.extend({
 ```
 
 
-Above, the initialize() method compiles a supplied Underscore template (using the _.template() function) in the instantiation. A more common way of referencing templates is placing them in a script tag using a custom script type (e.g type="text/template"). As this isn't a script type any browser understands, it's simply ignored, however referencing the script by an id attribute allows the template to be kept separate to other parts of the page which wish to use it. In real world applications, it's preferable to either do this or load in templates stored in external files for testing.
+위에서 initialize() 메쏘드는 제공된 Undersocre 템플릿을 객체화라 ( _.template() 함수를 사용해서 ) 컴파일한다. 템플릿을 참조하는 더 일반적인 방법은 템플릿을 사용자 정의 script 타입( 예를들어 type="text/template" )을 사용해서 script 태그에 넣는 것이다. 이것은 어떤 브라우져가 이해하는 스크립트 타입이 아니기 때문에, 단순히 무시되지만, 아이디 속성으로 스크립트를 참조하는 것은 사용하고 싶은 템플릿이 페이지의 다른 부분으로 분리하게 해준다. 실제 어플리케이션에서 이렇게 하거나 테스트를 위해서 외부에 저장한 템플릿을 로드하는 것이 선호된다.
 
-For testing purposes, we're going to continue using the string injection approach to keep things simple. There is however a useful trick that can be applied to automatically create or extend templates in the Jasmine scope for each test. By creating a new directory (say, 'templates') in the 'spec' folder and adding a new script file with the following contents, to jasmine.yml or SpecRunner.html, we can add a todo property which contains the Underscore template we wish to use:
+테스트 목적으로 우리는 문제를 단순화하기 위해서 문자열 삽입 방법을 계속 사용할 것이다. 그러나, 각 테스트의 Jasmine 범위에서 템플릿을 자동으로 생성하고 확장하는데 적용하는 유용하 방식이 있다. 'spec'폴더내에 새로운 디렉토리( 말하자면 'templates' )를 만들고 jasmine.yml이나 SpecRunner.html에 다음 내용의 새로운 스크립트를 추가하면, 우리는 우리가 사용하고 싶은 Underscore 템플릿을 포함하고 있는 todo 특성을 추가할 수 있다:
 
 ```javascript
 beforeEach(function() {
@@ -9256,7 +9256,7 @@ beforeEach(function() {
 });
 ```
 
-To finish this off, we simply update our existing spec to reference the template when instantiating the TodoView object:
+마지막으로, 우리는 TodoView 객체를 객체화할 때 템플릿을 참조하는 명세를 단지 갱신한다:
 
 
 ```javascript
@@ -9276,7 +9276,7 @@ describe('TodoView', function() {
 ```
 
 
-The existing specs we've looked at would continue to pass using this approach, leaving us free to adjust the template with some additional conditional logic for Todos with a status of 'done':
+우리가 본 원래 명세는 'done' 상태를 가진 Todo를 위한 추가적인 조건 로직을 가진 템플릿을 자유로이 수정하기 위해서 이 방법을 사용해서 전달된다:
 
 ```javascript
 beforeEach(function() {
@@ -9288,53 +9288,53 @@ beforeEach(function() {
 });
 ```
 
-This will now also pass without any issues. Remember that jasmine-jquery also supports loading external fixtures into your specs easily using its build in ```loadFixtures()``` and ```readFixtures()``` methods. For more information, consider reading the official jasmine-jquery [docs](https://github.com/velesin/jasmine-jquery).
+이것은 이젠 어떤 문제도 없이 통과할 것이다. jasmine-jquery가 ```loadFixtures()```와 ```readFixtures()``` 메쏘드를 만들어진 것을 사용해서 외부 픽스쳐를 명세로 로딩하는 것다 지원한다. 더 많은 정보를 위해서 jasmine-jquery 정규 [문서](https://github.com/velesin/jasmine-jquery)를 읽을 것을 고려해 봐라.
 
 
-## Conclusions
+## 결론
 
-We have now covered how to write Jasmine tests for models, views and collections with Backbone.js. Whilst testing routing can at times be desirable, some developers feel it can be more optimal to leave this to third-party tools such as Selenium, so do keep this in mind.
+우리는 이제 어떻게 Backbone.js의 모델, 뷰, 컬렉션에 대한 Jasmine 테스트를 작성하는 법을 배웠다. 라우팅을 테스트하는 것도 바람직하지만, 어떤 개발자는 Selenium같은 다른 툴에게 남겨두는 것이 더 낫다고 생각하기 때문에 기억만 하고 있어라.
 
-James Newbery was kind enough to help me with writing the Views section above and his articles on [Testing Backbone Apps With SinonJS](http://tinnedfruit.com/2011/04/26/testing-backbone-apps-with-jasmine-sinon-3.html) were of great inspiration (you'll actually find some Handlebars examples of the view specs in part 3 of his article). If you would like to learn more about writing spies and mocks for Backbone using [SinonJS](http://sinonjs.org) as well as how to test Backbone routers, do consider reading his series.
+James Newbery는 친절하게도 내가 위의 뷰 센션을 쓰도록 도와주었고 [Testing Backbone Apps With SinonJS](http://tinnedfruit.com/2011/04/26/testing-backbone-apps-with-jasmine-sinon-3.html) 에서의 그의 글은 큰 영감이 되었다( 당신은 그의 글 세번째 파트에서 뷰 명세에의 Handlebars 예제를 찾을 수 있을 것이다 ). 당신이 [SinonJS](http://sinonjs.org)을 사용한 Backbone의 스파이나 목 작성 뿐만 아니라 Backbone 라우터를 테스트하는 법을 배우고 싶다면 그의 시리즈를 읽어보라.
 
-## Exercise
+## 연습
 
-As an exercise, I recommend now trying the Jasmine Koans in `practicals\jasmine-joans` and trying to fix some of the purposefully failing tests it has to offer. This is an excellent way of not just learning how Jasmine specs and suites work, but working through the examples (without peeking back) will also put your Backbone skills to test too.
+연습으로 `practicals\jasmine-joans`에 있는 Jasmine Koans을 해보고 제공된 실패하는 테스트를 수정해 볼 것을 추천한다. 이것은 단순히 Jasmine 명세와 스위트가 어떻게 동작하는지를 배우는 것이 아니다. 예제를 통한 작업이 Backbone 기술을 테스트에도 적용될 것이다..
 
 
-## Further reading
+## 더 읽어볼 것
 * [Jasmine + Backbone Revisited](http://japhr.blogspot.com/2011/11/jasmine-backbonejs-revisited.html)
 * [Backbone, PhantomJS and Jasmine](http://japhr.blogspot.com/2011/12/phantomjs-and-backbonejs-and-requirejs.html)
 
 
-## Unit Testing Backbone Applications With QUnit And SinonJS
+## QUnit과 SinonJS를 사용한 Backbone 어플리케이션의 단위 테스트
 
-## Introduction
+## 소개
 
-QUnit is a powerful JavaScript test suite written by jQuery team member [Jörn Zaefferer](http://bassistance.de/) and used by many large open-source projects (such as jQuery and Backbone.js) to test their code. It's both capable of testing standard JavaScript code in the browser as well as code on the server-side (where environments supported include Rhino, V8 and SpiderMonkey). This makes it a robust solution for a large number of use-cases.
+QUnit은 jQuery 팀원 [Jörn Zaefferer](http://bassistance.de/)이 만든 강력한 자바스크립트 테스트 스위트이며 자신들의 코드를 테스트하기 위해 ( jQuery과 Backbone.js와 같은 ) 큰 오픈 소스 프로젝트들에 의해 사용된다. 브라우져에서 뿐만 이리나 서버( Rhino, V8, 그리고 SpiderMonkey를 포함해서 지원되는 곳 )에서도 표준 자바스크립트 코드를 테스트할 수 있다. 이것은 많은 활용 예제에 대한 견고한 해결책이 되게 한다.
 
-Quite a few Backbone.js contributors feel that QUnit is a better introductory framework for testing if you don't wish to start off with Jasmine and BDD right away. As we'll see later on in this chapter, QUnit can also be combined with third-party solutions such as SinonJS to produce an even more powerful testing solution supporting spies and mocks, which some say is preferable over Jasmine.
+몇몇 Backbone.js 기여자들은 당신이 당장 Jasmine과 BDD로 시작하고 싶지않다면, QUnit이 테스트에 더 좋은 인문자용 프레임워크라고 생각한다. 이번 챕터에서 보듯이, 스파이와 목을 지원하는 더 강력한 테스트 솔루션을 만들기 위해 QUnit은 SinonJS와 같은 다른 솔루션과 결합할 수도 있다. 혹자는 Jasmine보다 낫다고 한다.
 
-My personal recommendation is that it's worth comparing both frameworks and opting for the solution that you feel the most comfortable with.
+내 개인적인 추전은 두 프레임워크를 비교하고 가장 편리한 것을 선택할 가치가 있다.
 
 
 # QUnit
 
-## Getting Setup
+## 설정하기
 
-Luckily, getting QUnit setup is a fairly straight-forward process that will take less than 5 minutes.
+운좋게도, QUnit을 설정하는 것은 5분도 안 걸리는 간단한 작업이다.
 
-We first setup a testing environment composed of three files:
+우리는 먼저 세개의 파일로 구성된 테스트 환경을 설정한다:
 
-* A HTML **structure** for displaying test results,
-* The **qunit.js** file composing the testing framework and,
-* The **qunit.css** file for styling test results.
+* 테스트 결과를 보여주는 HTML **구조**,
+* 테스트 프레임워크를 구성하는 **qunit.js** 파일,
+* 테스트 결과를 스타일링하는 **qunit.css** 파일.
 
-The latter two of these can be downloaded from the [QUnit website](http://qunitjs.com).
+이들중에 뒤의 두개는 [QUnit website](http://qunitjs.com)에서 다운로드할 수 있다.
 
-If you would prefer, you can use a hosted version of the QUnit source files for testing purposes. The hosted URLs can be found at [http://github.com/jquery/qunit/raw/master/qunit/].
+원한다면, 당신은 테스트 목적으로 QUnit 소스의 호스팅 버젼을 사용할 수도 있다. 호스팅 URL은 [http://github.com/jquery/qunit/raw/master/qunit/]에서 찾을 수 있다.
 
-#### Sample HTML with QUnit-compatible markup:
+#### QUnit과 호환되는 마크업을 가진 예제 HTML:
 
 ```html
 <!DOCTYPE html>
@@ -9361,43 +9361,43 @@ If you would prefer, you can use a hosted version of the QUnit source files for 
 </html>
 ```
 
-Let's go through the elements above with qunit mentioned in their ID. When QUnit is running:
+위에서 아이디로 언급된 요소들을 경험해보자. QUnit이 실행될 때:
 
-* **qunit-header** shows the name of the test suite
-* **qunit-banner** shows up as red if a test fails and green if all tests pass
-* **qunit-testrunner-toolbar** contains additional options for configuring the display of tests
-* **qunit-userAgent** displays the navigator.userAgent property
-* **qunit-tests** is a container for our test results
+* **qunit-header**는 테스트 스위트의 이름을 보여준다
+* **qunit-banner**는 테스트가 실패하면 빨강을 모든 테스트가 통과하면 녹색을 보여준다
+* **qunit-testrunner-toolbar**는 테스트를 보여주는데 관련된 추가 설정을 포함한다
+* **qunit-userAgent**는 navigator.userAgent 특성을 보여준다
+* **qunit-tests**는 테스트 결과를 위한 컨테이너이다
 
-When running correctly, the above test runner looks as follows:
+잘 실행되면 위의 테스트 실행기는 다음과 같이 보이다:
 
 ![screenshot 1](img/7d4de12.png)
 
-The numbers of the form (a, b, c) after each test name correspond to a) failed asserts, b) passed asserts and c) total asserts. Clicking on a test name expands it to display all of the assertions for that test case. Assertions in green have successfully passed.
+각 테스트 이름 뒤의 폼(a, b, c)의 수는 a) 실패한 단언, b) 통과한 단언, c) 전체 단언에 대응한다. 테스트 이름을 클릭하면 테스트케이스에 대한 모든 검증이 펴쳐져서 보여진다. 녹색인 단언은 성공적으로 통과된 것이다.
 
 ![screenshot 2](img/9df4.png)
 
-If however any tests fail, the test gets highlighted (and the qunit-banner at the top switches to red):
+그러나 어떤 테스트라도 실패하면, 테스트는 눈에 띈다( 그리고 가장 위쪽의 qunit-banner가 빨간색으로 바뀐다 ):
 
 ![screenshot 3](img/3e5545.png)
 
 
-## Assertions
+## 단언
 
-QUnit supports a number of basic **assertions**, which are used in testing to verify that the result being returned by our code is what we expect. If an assertion fails, we know that a bug exists.Similar to Jasmine, QUnit can be used to easily test for regressions. Specifically, when a bug is found one can write an assertion to test the existence of the bug, write a patch and then commit both. If subsequent changes to the code break the test you'll know what was responsible and be able to address it more easily.
+QUnit은 많은 기본 **단언**을 지원한다. 단언은 코드가 반환한 결과가 예상한 것과 같은지 확인하기 위해서 테스트에서 사된된다. 단언이 실패하면, 우리는 버그가 있다는 것을 알게 된다. Jasmine과 비슷하게 QUnit은 회귀 테스트를 쉽게 할 수 있다. 특히 버그가 발견되었을 때, 버그의 존제를 테스트하는 단언을 작성하고 수정과 반영을 할 수 있다. 코드의 세부 변경이 테스트를 깬다면, 어떻게 대응하고 어디로 접근할 수 있는지 쉽게 알 수 있다.
 
-Some of the supported QUnit assertions we're going to look at first are:
+우선 살펴볼 QUnit 단언은 :
 
-*   `ok ( state, message )` - passes if the first argument is truthy
-*   `equal ( actual, expected, message )` - a simple comparison assertion with type coercion
-*   `notEqual ( actual, expected, message )` - the opposite of the above
-*   `expect( amount )` - the number of assertions expected to run within each test
-*   `strictEqual( actual, expected, message)` - offers a much stricter comparison than `equal()` and is considered the preferred method of checking equality as it avoids stumbling on subtle coercion bugs
-*   `deepEqual( actual, expected, message )` - similar to `strictEqual`, comparing the contents (with `===`) of the given objects, arrays and primitives.
+*   `ok ( state, message )` - 첫번째 인자가 true인지를 전달한다
+*   `equal ( actual, expected, message )` - 타입 변경까지 포함한 단순 비교 단언
+*   `notEqual ( actual, expected, message )` - 위의 반대
+*   `expect( amount )` - 각 테스트에서 실행이 예상되는 단언의 수
+*   `strictEqual( actual, expected, message)` - `equal()`보다 더 엄격한 비교. 사소한 타입 변경 버그를 비하기 때문에 동일성 확인에 더 선호되는 방법으로 간주된다
+*   `deepEqual( actual, expected, message )` - `strictEqual`와 유사하다. ( `===` 를 사용해서 ) 주어진 객체, 배열, 원시 타입의 내용을 비교한다.
 
-Creating new test cases with QUnit is relatively straight-forward and can be done using ```test()```, which constructs a test where the first argument is the ```name``` of the test to be displayed in our results and the second is a ```callback``` function containing all of our assertions. This is called as soon as QUnit is running.
+QUnit으로 새로운 테스트 케이스를 만드는 것은 상대적으로 간단하고 ```test()```를 사용하는데, 이 메쏘드는 첫인자가 결과에 보여지는 테스트의 ```이름```이고 두번째는 단언들을 포함하고 있는 함수 ```콜백```인 테스트를 만든다. 이것은 QUnit이 실행되자마자 호출된다.
 
-#### Basic test case using test( name, callback ):
+#### test( name, callback )를 사용한 기본 테스트케이스:
 
 ```javascript
 var myString = 'Hello Backbone.js';
@@ -9413,13 +9413,13 @@ test( 'Our first QUnit test - asserting results', function(){
 });
 ```
 
-What we're doing in the above is defining a variable with a specific value and then testing to ensure the value was what we expected it to be. This was done using the comparison assertion, ```equal()```, which expects its first argument to be a value being tested and the second argument to be the expected value. We also used ```ok()```, which allows us to easily test against functions or variables that evaluate to booleans.
+위에서 우리가 한 것은 특정 값으로 변수를 정의하고나서 값이 예상한 것과 같은지 테스트하는 것이다. 이것은 비교 단언 ```equal()```을 사용해서 한다. 그것은 첫번째 인자로 테스트할 값이 들어오고 두번째 인자로 예상되는 값이 들어올 거라 예상한다. 우리는 또한 ```ok()```도 사용한다. 그것은 우리가 논리값으로 계산되는 함수나 변수를 통해 쉽게 테스트하게 해준다.
 
-Note: Optionally in our test case, we could have passed an 'expected' value to ```test()``` defining the number of assertions we expect to run. This takes the form: `test( name, [expected], test );` or by manually settings the expectation at the top of the test function, like so: `expect( 1 )`. I recommend you to make it a habit and always define how many assertions you expect. More on this later.
+주의: 우리 테스트케이스에서 우리는 '예상되는' 값을 실행할 단언의 수를 정의한 ```test()```에 전달할 수 있다. 다음의 형태를 취한다: `test( name, [expected], test );` 혹은 다음과 같이 직접 test 함수의 가장 위에 예상을 지정한다: `expect( 1 )`. 나는 예상되는 단언의 수를 항상 정의하는 습관을 들이라고 권한다. 나중에 더 설명하겠다.
 
-As testing a simple static variable is fairly trivial, we can take this further to test actual functions. In the following example we test the output of a function that reverses a string to ensure that the output is correct using ```equal()``` and ```notEqual()```:
+간단한 정적 변수를 테스트하는 것은 너무 사소하기 때문에, 우리는 실제 함수를 더 테스트할 수 있다. 다음 예제에서 우리는 문자열의 순서를 바꾸는 함수의 결과를 ```equal()```과 ```notEqual()```을 사용해서 결과가 올바른지 테스트한다:
 
-#### Comparing the actual output of a function against the expected output:
+#### 함수의 실제 결과를 예상되는 결과와 비교하기:
 
 ```javascript
 function reverseString( str ){
@@ -9436,14 +9436,14 @@ test( 'reverseString()', function() {
 })
 ```
 
-Running these tests in the QUnit test runner (which you would see when your HTML test page was loaded) we would find that four of the assertions pass whilst the last one does not. The reason the test against `'double'` fails is because it was purposefully written incorrectly. In your own projects if a test fails to pass and your assertions are correct, you've probably just found a bug!
+( HTML 테스트 페이지가 로드될 때 보게되는 ) QUnit 테스트 실행기에서 이 테스트들을 실행하면, 네개의 단언은 통과했지만 마지막 것은 통과하지 못하는 것을 발견한다. `'double'`에 대한 테스트가 실패하는 이유는 본질적으로 잘못 작성되었기 때문이다. 우리 프로젝트에서 테스트가 통과하지 못하고 단언이 옳다면, 당신은 버그를 찾은 것이다!
 
 
-## Adding structure to assertions
+## 단언에 구조 추가하기
 
-Housing all of our assertions in one test case can quickly become difficult to maintain, but luckily QUnit supports structuring blocks of assertions more cleanly. This can be done using ```module()``` - a method that allows us to easily group tests together. A typical approach to grouping might be keeping multiple tests testing a specific method as part of the same group (module).
+테스트 케이스의 모든 단언을 묶는 것을 유지하기 어려워질 가능성이 높지만, 운좋게도 QUnit은 단언의 구조 블럭을 깔끔하게 지원한다. 이것은 ```module()```를 사용해서 한다 - 그 메쏘드는 우리가 쉽게 테스트를 묶게 해준다. 그룹핑의 일반적인 접근법은 특정 메쏘드를 테스트하는 여러 테스트를 같은 그룹( 모듈 )의 일부로 하는 것이다.
 
-#### Basic QUnit Modules:
+#### 기본 QUnit 모듈:
 ```javascript
 module( 'Module One' );
 test( 'first test', function() {} );
@@ -9458,30 +9458,30 @@ test( 'third test', function() {} );
 test( 'another test', function() {} );
 ```
 
-We can take this further by introducing ```setup()``` and ```teardown()``` callbacks to our modules, where ```setup()``` is run before each test whilst ```teardown()``` is run after each test.
+우리는 이것을 ```setup()```과 ```teardown()``` 콜백을 우리 모듈에 넣어서 할 수 있다. ```setup()```은 각 테스트 전에 실행되는 반면 ```teardown()```은 테스트 후에 실행된다.
 
-#### Using setup() and teardown() :
+#### setup()과 teardown()을 사용하기:
 ```javascript
 module( 'Module One', {
     setup: function() {
-        // run before
+        // 이전에 실행
     },
     teardown: function() {
-        // run after
+        // 이후에 실행
     }
 });
 
 test('first test', function() {
-    // run the first test
+    // 첫 테스트를 실행
 });
 ```
 
-These callbacks can be used to define (or clear) any components we wish to instantiate for use in one or more of our tests. As we'll see shortly, this is ideal for defining new instances of views, collections, models or routers from a project that we can then reference across multiple tests.
+이 콜백은 하나 이상의 테스트를 사용하기 위해 객체화하고 싶은 컴포넌트를 정의하는데 ( 혹은 삭제하는데 ) 사용될 수 있다. 간단히 보았다시피, 이것은 프로젝트에서 우리가 여러 테스트로 참조하는 뷰, 컬렌션, 모델 혹은 라우터의 새 객체를 정의하는데 이상적이다.
 
-#### Using setup() and teardown() for instantiation and clean-up:
+#### 객체화하고 다시 정리하기 위해 setup()과 teardown()을 사용하기:
 ```javascript
-// Define a simple model and collection modeling a store and
-// list of stores
+// 상점과 상점 목록을 모델링하는
+// 모델과 컬렉션을 정의한다
 
 var Store = Backbone.Model.extend({});
 
@@ -9490,7 +9490,7 @@ var StoreList = Backbone.Collection.extend({
     comparator: function( store ) { return store.get('name') }
 });
 
-// Define a group for our tests
+// 테스트를 위한 그룹을 정의한다
 module( 'StoreList sanity check', {
     setup: function() {
         this.list = new StoreList;
@@ -9504,7 +9504,7 @@ module( 'StoreList sanity check', {
     }
 });
 
-// Test the order of items added
+// 추가된 항목의 순서를 테스트한다
 test( 'test ordering', function() {
     expect( 1 );
     var expected = ['Barnes & Noble', 'Costcutter', 'Target', 'Walmart'];
@@ -9514,14 +9514,14 @@ test( 'test ordering', function() {
 
 ```
 
-Here, a list of stores is created and stored on ```setup()```. A ```teardown()``` callback is used to simply clear our a list of errors we might be storing within the window scope, but is otherwise not needed.
+여기에서, 상점 목록은 ```setup()```에서 생성되고 저장된다. ```teardown()``` 콜백은 단순히 window 범위에 저장되어 있지만 전혀 필요없는 에러 목록들을 지운다.
 
 
-## Assertion examples
+## 단언 예제
 
-Before we continue any further, let's review some more examples of how QUnits various assertions can be correctly used when writing tests:
+더 진행하기 전에, 테스트를 작성할 때 다양한 QUnit 단언이 어떻게 올바르게 사용되는지의 예제를 살펴보자:
 
-### equal - a comparison assertion. It passes if actual == expected
+### equal - 비교 단언. 실제값 == 예상값 이면 통과한다
 
 ```javascript
 test( 'equal', 2, function() {
@@ -9532,7 +9532,7 @@ test( 'equal', 2, function() {
 ```
 
 
-### notEqual - a comparison assertion. It passes if actual != expected
+### notEqual - 비교 단언. 실제값 != 예상값 이면 통과한다
 
 ```javascript
 test( 'notEqual', 2, function() {
@@ -9542,7 +9542,7 @@ test( 'notEqual', 2, function() {
 });
 ```
 
-### strictEqual - a comparison assertion. It passes if actual === expected.
+### strictEqual - 비교 단언. 실제값 === 예상값 이면 통과한다.
 
 ```javascript
 test( 'strictEqual', 2, function() {
@@ -9552,7 +9552,7 @@ test( 'strictEqual', 2, function() {
 });
 ```
 
-### notStrictEqual - a comparison assertion. It passes if actual !== expected.
+### notStrictEqual - 비교 단언. 실제값 !== 예상값 이면 통과한다.
 
 ```javascript
 test('notStrictEqual', 2, function() {
@@ -9562,7 +9562,7 @@ test('notStrictEqual', 2, function() {
 });
 ```
 
-### deepEqual - a recursive comparison assertion. Unlike strictEqual(), it works on objects, arrays and primitives.
+### deepEqual - 재귀 비교 단언. strictEqual()과 달리, 객체, 배열, 원시 타입에 동작한다.
 
 ```javascript
 test('deepEqual', 4, function() {
@@ -9578,7 +9578,7 @@ test('deepEqual', 4, function() {
 });
 ```
 
-### notDeepEqual - a comparison assertion. This returns the opposite of deepEqual
+### notDeepEqual - 재귀 비교 단언. 이것은 deepEqual과 반대값을 반환한다.
 
 ```javascript
 test('notDeepEqual', 2, function() {
@@ -9588,7 +9588,7 @@ test('notDeepEqual', 2, function() {
 });
 ```
 
-### raises - an assertion which tests if a callback throws any exceptions
+### raises - 콜백이 어떤 예외를 던지는지 테스트하는 단언
 
 ```javascript
 test('raises', 1, function() {
@@ -9598,10 +9598,10 @@ test('raises', 1, function() {
 });
 ```
 
-## Fixtures
+## 픽스쳐
 
 
-From time to time we may need to write tests that modify the DOM. Managing the clean-up of such operations between tests can be a genuine pain, but thankfully QUnit has a solution to this problem in the form of the `#qunit-fixture` element, seen below.
+때때로 우리는 DOM을 수정하는 테스트를 작성해야만 한다. 테스트들 사이에 그런 동작을 정리하는 것을 관리하는 것은 진짜 고통이 될 수도 있지만, 고맙게도 QUnit은 아래에서 보듯이 `#qunit-fixture` 요소의 형태로 이 문제에 대한 해결책을 가지고 있다.
 
 #### Fixture markup:
 ```html
@@ -9625,29 +9625,29 @@ From time to time we may need to write tests that modify the DOM. Managing the c
 </html>
 ```
 
-We can either opt to place static markup in the fixture or just insert/append any DOM elements we may need to it. QUnit will automatically reset the `innerHTML` of the fixture after each test to its original value. In case you're using jQuery, it's useful to know that QUnit checks for its availability and will opt to use ```$(el).html()``` instead, which will cleanup any jQuery event handlers too.
+우리는 픽스쳐에 정적인 마크업을 놓거나 단지 필요한 DOM 요소를 삽입/추가할 수 있다. QUnit은 자동적으로 각 테스트 후에 픽스쳐의 `innerHTML`을 원래 값으로 복원한다. 우리가 jQuery를 사용한 경우에 QUnit이 사용가능성을 확인하고 대신 ```$(el).html()```을 사용하는 것을 알아두면 유용하다. 그것은 어떤 jQuery 이벤트 처리자도 정리한다.
 
 
-### Fixtures example:
+### 픽스쳐 예제:
 
-Let us now go through a more complete example of using fixtures. One thing that most of us are used to doing in jQuery is working with lists - they're often used to define the markup for menus, grids and a number of other components. You may have used jQuery plugins before that manipulated a given list in a particular way and it can be useful to test that the final (manipulated) output of the plugin is what was expected.
+이제 픽스쳐를 사용하는 전체 예제를 경험해보자. 우리 대부분이 jQuery로 하는데 사용하는 것은 리스트로 하는 것이다 - 그것들은 종종 메뉴, 그리드, 그리고 많은 다른 컴포넌트를 위한 마크업을 정의하는데 사용된다. 당신은 주어진 리스트를 특정 방식으로 다루기 전에 jQuery 플러그인을 사용해서 플러그인의 최종 ( 처리된 ) 결과가 예상한 대로인지 테스트하는 것이 유용할 수 있다.
 
-For the purposes of our next example, we're going to use Ben Alman's `$.enumerate()` plugin, which can prepend each item in a list by its index, optionally allowing us to set what the first number in the list is. The code snippet for the plugin can be found below, followed by an example of the output is generates:
+다음 예제의 목적으로, 우리는 Ben Alman의 `$.enumerate()` 플러그인을 사용할 것이다. 그것은 리스트의 각 항목을 선택적으로 리스트의 첫번째 번호를 지정한 인덱스를 붙여준다. 플러그인에 대한 코드 조각은 아래에 있고 예제에서 만들어진 결과가 그다음에 있다:
 
 ```javascript
 $.fn.enumerate = function( start ) {
       if ( typeof start !== 'undefined' ) {
-        // Since `start` value was provided, enumerate and return
-        // the initial jQuery object to allow chaining.
+        // `start` 값이 제공되었기 때문에 
+	// 체이닝할 수 있는 초기 jQuery 객체가 반환된다.
 
         return this.each(function(i){
           $(this).prepend( '<b>' + ( i + start ) + '</b> ' );
         });
 
       } else {
-        // Since no `start` value was provided, function as a
-        // getter, returing the appropriate value from the first
-        // selected element.
+        // `start` 값이 제공되지 않으면, 
+	// 첫번째 선택된 요소에서 적당한 값을
+	// 반환하는 getter같은 함수
 
         var val = this.eq( 0 ).children( 'b' ).eq( 0 ).text();
         return Number( val );
@@ -9665,7 +9665,7 @@ $.fn.enumerate = function( start ) {
 */
 ```
 
-Let's now write some specs for the plugin. First, we define the markup for a list containing some sample items inside our ```qunit-fixture``` element:
+이제 이 플러그인에 대한 명세를 작성하자. 우선 우리는 ```qunit-fixture``` 요소 안의 예제 항목들을 포함하는 목록을 위한 마크업을 정의한다:
 
 ```html
 &lt;div id=&quot;qunit-fixture&quot;&gt;
@@ -9679,15 +9679,15 @@ Let's now write some specs for the plugin. First, we define the markup for a lis
   &lt;/div&gt;
 ```
 
-Next, we need to think about what should be tested. `$.enumerate()` supports a few different use cases, including:
+다음으로, 우리는 무엇을 테스트해야만 하는지에 대해 생각해야만 한다. `$.enumerate()`는 다음과 같은 몇가지 다른 사용례를 제공한다:
 
-* **No arguments passed** - i.e ```$(el).enumerate()```
-* **0 passed as an argument** - i.e ```$(el).enumerate(0)```
-* **1 passed as an argument** - i.e ```$(el).enumerate(1)```
+* **인자없이** - 즉 ```$(el).enumerate()```
+* **0을 인자로** - 즉 ```$(el).enumerate(0)```
+* **1을 인자로** - 즉 ```$(el).enumerate(1)```
 
-As the text value for each list item is of the form "n. item-text" and we only require this to test against the expected output, we can simply access the content using ```$(el).eq(index).text()``` (for more information on .eq() see [here](http://api.jquery.com/eq/)).
+각 목록 항목에 대한 문자열 값이 "n. item-text"과 같은 형태이고 우리가 예상되는 결과를 테스트하기 위해 이것을 필요로 하기 때문에, 우리는 ```$(el).eq(index).text()```을 사용해서 내용에 접근할 수 있다( .eq()에 대한 더 많은 정보는 [여기](http://api.jquery.com/eq/)에서 볼수 있다 ).
 
-and finally, here are our test cases:
+그리고 마지막으로 테스트 케이스는 여기있다:
 
 ```javascript
 module('jQuery#enumerate');
@@ -9721,13 +9721,13 @@ test( '1 passed as an argument', 3, function() {
 
 ```
 
-## Asynchronous code
+## 비동기 코드
 
-As with Jasmine, the effort required to run synchronous tests with QUnit is fairly straight-forward. That said, what about tests that require asynchronous callbacks (such as expensive processes, Ajax requests and so on)? When we're dealing with asynchronous code, rather than letting QUnit control when the next test runs, we can inform that we need it to stop running and wait until it's okay to continue once again.
+Jasmine으로 할 때처럼, QUnit으로 테스트를 동기적으로 실행하는데 필요한 노련은 매우 간단하따. 즉, ( 프로세스 처리, Ajax 요청, 등등과 같은 ) 비동기적인 콜백을 필요로 하는 테스트는 어떤가? 다음 테스트가 실행될 때, QUnit이 제어하기 보다는 비동기적 코드로 다룰 때, 우리는 실행을 멈추고 다시 괜찮아질 때까지 기다려야만 하는 것을 알 수 있다.
 
-Remember: running asynchronous code without any special considerations can cause incorrect assertions to appear in other tests, so we want to make sure we get it right.
+기억하라: 특별한 고려없이 비동기적 코드를 실행하는 것은 다른 테스트에서 나타난 부정확한 단언이 호출될 수 있어서 그것이 옳은지 확인하고 싶다.
 
-Writing QUnit tests for asynchronous code is made possible using the ```start()``` and ```stop()``` methods, which programmatically set the start and stop points during such tests. Here's a simple example:
+비동기 코드에 대한 QUnit 테스트를 작성하는 것은 ```start()```와 ```stop()``` 메쏘드를 사용해서 가능하다. 그것은 프로그램적으로 그 테스트동안 시작과 종료 지점을 지정한다. 여기 단순한 예제가 있다:
 
 ```javascript
 test('An async test', function(){
@@ -9747,9 +9747,9 @@ test('An async test', function(){
 });
 ```
 
-A jQuery ```$.ajax()``` request is used to connect to a test resource and assert that the data returned is correct. ```deepEqual()``` is used here as it allows us to compare different data types (e.g objects, arrays) and ensures that what is returned is exactly what we're expecting. We know that our Ajax request is asynchronous and so we first call ```stop()```, run the code making the request and finally at the very end of our callback, inform QUnit that it is okay to continue running other tests.
+jQuery ```$.ajax()``` 요청은 테스트 자원에 접속해서 반환된 데이타가 옳은지 단언하는데 사용된다. ```deepEqual()```은 ( 객체, 배열같은 ) 다른 데이타 타입을 비교하도록 해주고, 반환된 것이 예상한 것과 정확히 같은 것인지 확인해 주기 때문에 여기에서 사용된다. 우리는 Ajax 요청이 비동기전인 것을 알고 우선 ```stop()```을 호출하고 요청을 만드는 코드를 실행하고 마지막에 콜백의 맨 끝에서 QUnit에게 다른 테스트를 계속 실행해도 괜찮다고 알려준다.
 
-Note: rather than including ```stop()```, we can simply exclude it and substitute ```test()``` with ```asyncTest()``` if we prefer. This improves readability when dealing with a mixture of asynchronous and synchronous tests in your suite. Whilst this setup should work fine for many use-cases, there is no guarantee that the callback in our ```$.ajax()``` request will actually get called. To factor this into our tests, we can use ```expect()``` once again to define how many assertions we expect to see within our test. This is a healthy safety blanket as it ensures that if a test completes with an insufficient number of assertions, we know something went wrong and fix it.
+주의: 만일 원한다면, ```stop()```을 포함하기 보다는 간단히 그것을 빼고 ```test()```를 ```asyncTest()```로 대체할 수 있다. 이것은 스위트에 비동기 테스트와 동기 테스트가 섞여있는 경우에 가독성을 개선한다. 이 설정이 많은 경우에 잘 동작하는 반면, ```$.ajax()``` 요정의 콜백이 실제로 호출될지에 대한 보장은 없다. 이것을 우리 테스트로 넣기 위해서 우리는 테스트 안에서 몇개의 단언을 만날지를 정의하는 ```expect()```를 또다시 사용할 수 있다. 이것은 테스트가 불충분한 단언으로 종료되면, 뭔가 잘못됐음을 알고 고치게 하는 안전 장치이다.
 
 
 
