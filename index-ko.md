@@ -9877,38 +9877,38 @@ test( 'Should call a subscriber and check call counts', function () {
 
 ## 스텁과 목
 
-SinonJS also supports two other powerful features which are useful to be aware of: stubs and mocks. Both stubs and mocks implement all of the features of the spy API, but have some added functionality.
+SinonJS도 알려진 유용한 두가지 강력한 기능을 제공한다: 스텁과 목. 스텁과 목 모두 스파이 API 기능 모두를 구현하지만, 몇가지 추가 기능이 있다.
 
-### Stubs
+### 스텁
 
-A stub allows us to replace any existing behaviour for a specific method with something else. They can be very useful for simulating exceptions and are most often used to write test cases when certain dependencies of your code-base may not yet be written.
+스텁은 우리가 특정 메쏘드에 존재하는 기능을 다른 것으로 바꾸게 해준다. 예외를 흉내내는데 매우 유용하고 코드의 의존성이 아직 없을 때 테스트 케이스를 작성하는데 자주 사용된다.
 
-Let us briefly re-explore our Backbone Todo application, which contained a Todo model and a TodoList collection. For the purpose of this walkthrough, we want to isolate our TodoList collection and fake the Todo model to test how adding new models might behave.
+Backbone Todo 어플리케이션을 간단히 다시 살펴보자. 그것은 Todo 모델과 TodoList 컬렉션을 가지고 있다. 이것은 설명하기 위해, 우리는 새로운 모델을 추가하면 어떻게 동작하는 테스트하기 위해 TodoList 컬렉션을 분리해서 Todo 모델을 속이고 싶다.
 
-We can pretend that the models have yet to be written just to demonstrate how stubbing might be carried out. A shell collection just containing a reference to the model to be used might look like this:
+우리는 스텁을 사용하는 것이 어떻게 하는 것인지 보여주기 위해서 모델을 아직 작성하지 않았다고 하자. 사용하는 모델을 참조하는 컬렉션은 다음과 같다:
 
 ```javascript
 var TodoList = Backbone.Collection.extend({
     model: Todo
 });
 
-// Let's assume our instance of this collection is
+// 이 컬렉션의 객체를 다음으로 가정하자
 this.todoList;
 ```
 
-Assuming our collection is instantiating new models itself, it's necessary for us to stub the models constructor function for the the test. This can be done by creating a simple stub as follows:
+컬렉션이 새 모델을 객체화한다고 가정하고, 우리는 테스트를 위해서 모델 생성자를 서텁으로 만들어야 한다. 이것은 다음과 같이 단순한 스텁을 만듦으로써 할 수 있다:
 
 ```javascript
 this.todoStub = sinon.stub( window, 'Todo' );
 ```
 
-The above creates a stub of the Todo method on the window object. When stubbing a persistent object, it's necessary to restore it to its original state. This can be done in a ```teardown()``` as follows:
+위의 코드는 window 객체 상에 Todo 메쏘드 스텁을 생성한다. 퍼시스턴트 객체의 스텁을 만들 때, 원래 상태를 복원해야만 한다. 이것은 다음과 같이 ```teardown()```에서 할 수 이다:
 
 ```javascript
 this.todoStub.restore();
 ```
 
-After this, we need to alter what the constructor returns, which can be efficiently done using a plain ```Backbone.Model``` constructor. Whilst this isn't a Todo model, it does still provide us an actual Backbone model.
+이다음에는, 우리는 생성자가 반환하는 것을 바꿔야만 한다. 그것은 원래의 ```Backbone.Model``` 생성자를 사용해서 효과적으로 할 수 있다. 이것은 Todo 모델은 아니지만, 실제 Backbone 모델을 제공한다.
 
 
 ```javascript
@@ -9921,13 +9921,13 @@ teardown: function() {
 });
 ```
 
-The expectation here might be that this snippet would ensure our TodoList collection always instantiates a stubbed Todo model, but because a reference to the model in the collection is already present, we need to reset the model property of our collection as follows:
+여기에서 예상은 이 코드가 TodoList 컬렉션이 스텁된 Todo 모델을 항상 객체화하도록 할 것이라는 것이다. 하지만 컬렉션의 모델에 대한 참조가 이미 있기 때문에, 우리는 다음과 같이 컬렉션의 모델 특성을 초기화해야만 한다:
 
 ```javascript
 this.todoList.model = Todo;
 ```
 
-The result of this is that when our TodoList collection instantiates new Todo models, it will return our plain Backbone model instance as desired. This allows us to write a spec for testing the addition of new model literals as follows:
+그 결과 TodoList 컬렉션이 새로운 Todo 모델을 객체화할 때, 원하는 대로 Backbone 모델을 반환할 것이다. 이것은 다음과 같이 새로운 모델 상수를 추가하는 테스트에 대한 명세를 만들 수 있게 해준다:
 
 ```javascript
 module( 'Should function when instantiated with model literals', {
@@ -9968,11 +9968,11 @@ test('should find a model by id', function() {
 ```
 
 
-### Mocks
+### 목
 
-Mocks are effectively the same as stubs, however they mock a complete API out and have some built-in expectations for how they should be used. The difference between a mock and a spy is that as the expectations for their use are pre-defined, it will fail if any of these are not met.
+목은 사실상 스텁과 같다. 하지만 그것은 전체 API를 가상화하고 사용방법에 대한 내장된 예상이 있다. 목과 스파이 사이의 차이는 사용에 대한 예상이 미리 정의되었기 때문에 예상에 맞지 않으면 사용할 수 없다.
 
-Here's a snippet with sample usage of a mock based on PubSubJS. Here, we have a `clearTodo()` method as a callback and use mocks to verify its behavior.
+여기 PubSubJS에 기초한 목을 간단히 사용하는 코드가 있다. 여기에서 콜백으로 `clearTodo()` 메쏘드가 있고, 동작을 보장하는 목을 사용한다.
 
 ```javascript
 test('should call all subscribers when exceptions', function () {
@@ -9993,22 +9993,22 @@ test('should call all subscribers when exceptions', function () {
 
 
 
-## Exercise
+## 연습
 
-We can now begin writing test specs for our Todo application, which are listed and separated by component (e.g Models, Collections etc.). It's useful to pay attention to the name of the test, the logic being tested and most importantly the assertions being made as this will give you some insight into how what we've learned can be applied to a complete application.
+우리는 이제 Todo 어플리케이션을 위한 테스트 명세 작성을 시작할 수 있다. 그것은 컴포넌트( 예를들어 모델, 컬렉션 등 )에 따라 구분되고 목록이 작성된다. 테스트 이름과 테스트되는 로직, 그리고 만들려는 단언에 집중하는 것이 실용적이다. 이것은 우리가 배운 것이 전체 어플리케이션에 어떻게 적용되는지 통찰력을 주기 때문이다.
 
-To get the most out of this section, I recommend looking at the QUnit Koans included in the `practicals\qunit-koans` folder - this is a port of the Backbone.js Jasmine Koans over to QUnit that I converted for this post.
+이번 섹션중 대부분을 이해하기 위해, 나는 `practicals\qunit-koans` 폴더의  QUnit Koans을 보길 바란다 - 이것은 Backbone.js Jasmine Koans의 일부를 차례로 QUnit으로 바꾼 것이다.
 
-*In case you haven't had a chance to try out one of the Koans kits as yet, they are a set of unit tests using a specific testing framework that both demonstrate how a set of specs for an application may be written, but also leave some tests unfilled so that you can complete them as an exercise.*
+*당신이 아직 Koans중에 하나도 바꾼 것이 없다면, 그것들은 어떻게 어플리케이션을 위한 명세를 작성하는지를 보여주는 특정 테스트 프레임워크를 사용한 단운 테스트들이지만, 당신이 연습으로 채울 수 있게 하기 위해 몇몇 테스트는 빈채로 남아있다.*
 
-### Models
+### 모델
 
-For our models we want to at minimum test that:
+우리가 모델에 대해 하고 싶은 최소한의 테스트는:
 
-* New instances can be created with the expected default values
-* Attributes can be set and retrieved correctly
-* Changes to state correctly fire off custom events where needed
-* Validation rules are correctly enforced
+* 새로운 객체가 예상되는 기본값으로 생성될 수 있다
+* 속성이 올바르게 설정되고 가져올 수 있다
+* 상태 변견이 필요에 따라 사용자 정의 이벤트를 구동한다
+* 검증 규칙이 올바르게 적용된다
 
 ```javascript
 module( 'About Backbone.Model');
@@ -10045,8 +10045,8 @@ test('Fires a custom event when the state changes.', function() {
     var todo = new Todo();
 
     todo.on( 'change', spy );
-    // How would you update a property on the todo here?
-    // Hint: http://documentcloud.github.com/backbone/#Model-set
+    // 여기에서 todo 특성을 어떻게 갱신하는가?
+    // 힌트: http://documentcloud.github.com/backbone/#Model-set
     todo.set( { text: 'new text' } );
 
     ok( spy.calledOnce, 'A change event callback was correctly triggered' );
@@ -10060,7 +10060,7 @@ test('Can contain custom validation rules, and will trigger an error event on fa
     var todo = new Todo();
 
     todo.on('error', errorCallback);
-    // What would you need to set on the todo properties to cause validation to fail?
+    // 검증이 실패하도록 todo 특성에 무엇을 설정해야만 하는가?
     todo.set( { done: 'not a boolean' } );
 
     ok( errorCallback.called, 'A failed validation correctly triggered an error' );
@@ -10071,13 +10071,13 @@ test('Can contain custom validation rules, and will trigger an error event on fa
 ```
 
 
-### Collections
+### 컬렉션
 
-For our collection we'll want to test that:
+컬렉션에 대해서 우리는 다음을 테스트하고 싶다:
 
-* New model instances can be added as both objects and arrays
-* Changes to models result in any necessary custom events being fired
-* A `url` property for defining the URL structure for models is correctly defined
+* 새로운 모델 객체가 객체와 배열의 형태로 추가될 수 있다
+* 모델의 변경이 필요한 사용자 이벤트를 구동시킨다
+* 모델의 URL 구조를 정의하는 `url` 특성이 올바르게 정의되었다
 
 
 ```javascript
@@ -10116,12 +10116,12 @@ test('Fires custom named events when the models change.', function() {
     todos.on( 'add', addModelCallback );
     todos.on( 'remove', removeModelCallback );
 
-    // How would you get the 'add' event to trigger?
+    // 어떻게 'add' 이벤트를 구동하는가?
     todos.add( {text:'New todo'} );
 
     ok( addModelCallback.called );
 
-    // How would you get the 'remove' callback to trigger?
+    // 어떻게 구동할 'remove' 콜백을 얻는가?
     todos.remove( todos.last() );
 
     ok( removeModelCallback.called );
@@ -10130,15 +10130,15 @@ test('Fires custom named events when the models change.', function() {
 
 
 
-### Views
+### 뷰
 
-For our views we want to ensure:
+뷰에 대하서 우리는 다음을 검증하고 싶다:
 
-* They are being correctly tied to a DOM element when created
-* They can render, after which the DOM representation of the view should be visible
-* They support wiring up view methods to DOM elements
+* 생성되었을 때, DOM 요소에 올바르게 묶인다
+* 뷰의 DOM 표현이 보여야만 하는 경우, 렌더링될 수 있다
+* 뷰 메쏘드를 DOM 요소에 묶이게 해준다
 
-One could also take this further and test that user interactions with the view correctly result in any models that need to be changed being updated correctly.
+더 나아가서 뷰와 상호작용이 변경되어야만 하는 모델이 올바르게 갱신되었는지 테스트한다.
 
 
 ```javascript
@@ -10167,11 +10167,11 @@ test('Is backed by a model instance, which provides the data.', function() {
 test('Can render, after which the DOM representation of the view will be visible.', function() {
    this.todoView.render();
 
-    // Hint: render() just builds the DOM representation of the view, but doesn't insert it into the DOM.
-    //       How would you append it to the ul#todoList?
-    //       How do you access the view's DOM representation?
+    // 힌트: render()는 단지 뷰의 DOM 표현을 만들지만 DOM에 삽입하지는 않는다.
+    //       그것을 어떻게 ul#todoList에 추가하는가?
+    //       어떻게 뷰의 DOM 표현에 접근하는가?
     //
-    // Hint: http://documentcloud.github.com/backbone/#View-el
+    // 힌트: http://documentcloud.github.com/backbone/#View-el
 
     $('ul#todoList').append(this.todoView.el);
     equal($('#todoList').find('li').length, 1);
@@ -10188,39 +10188,39 @@ asyncTest('Can wire up view methods to DOM elements.', function() {
 
         equal(viewElt.length > 0, true);
 
-        // Make sure that QUnit knows we can continue
+        // 계속 진행한다는 것을 QUnit에게 알려준다
         start();
     }, 1000, 'Expected DOM Elt to exist');
 
 
-    // Hint: How would you trigger the view, via a DOM Event, to toggle the 'done' status.
-    //       (See todos.js line 70, where the events hash is defined.)
+    // 힌트: DOM 이벤트를 통해 'done' 상태를 전환하기 위해서 어떻게 뷰를 구동하는 방법.
+    //       ( todos.js 70번째 줄을 보라. 거기에 이벤트 해쉬가 정의되어 있다. )
     //
-    // Hint: http://api.jquery.com/click
+    // 힌트: http://api.jquery.com/click
 
     $('#todoList li input.check').click();
     expect( this.todoView.model.get('done'), true );
 });
 ```
 
-### Event
+### 이벤트
 
-For events, we may want to test a few different use cases:
+이벤트를 위해서, 우리는 몇가지 다른 경우를 테스트하고 싶다:
 
-* Extending plain objects to support custom events
-* Binding and triggering custom events on objects
-* Passing along arguments to callbacks when events are triggered
-* Binding a passed context to an event callback
-* Removing custom events
+* 일반 객체가 사용자 이벤트를 지원하도록 확장한다
+* 객체에 사용자 이벤트가 바인딩되고 구동된다
+* 이벤트가 구동될 때 인자를 콜백에 전달한다
+* 이벤트 콜백에 전달된 컨택스트를 바인딩한다
+* 사용자 이벤트를 제거한다
 
-and a few others that will be detailed in our module below:
+그리고 아래에 모듈의 몇가지 다른 상세 내용이 있다:
 
 ```javascript
 module( 'About Backbone.Events', {
     setup: function() {
         this.obj = {};
         _.extend( this.obj, Backbone.Events );
-        this.obj.off(); // remove all custom events before each spec is run.
+        this.obj.off(); // 각 명세가 실행하기 전에 모든 사용자 이벤트를 제거한다.
     }
 });
 
@@ -10229,8 +10229,8 @@ test('Can extend JavaScript objects to support custom events.', function() {
 
     var basicObject = {};
 
-    // How would you give basicObject these functions?
-    // Hint: http://documentcloud.github.com/backbone/#Events
+    // 어떻게 basicObject에 이 함수들을 넣는가?
+    // 힌트: http://documentcloud.github.com/backbone/#Events
     _.extend( basicObject, Backbone.Events );
 
     equal( typeof basicObject.on, 'function' );
@@ -10246,7 +10246,7 @@ test('Allows us to bind and trigger custom named events on an object.', function
     this.obj.on( 'basic event', callback );
     this.obj.trigger( 'basic event' );
 
-    // How would you cause the callback for this custom event to be called?
+    // 어떻게 이 사용자 이벤트의 콜백인 후출되게 하는가?
     ok( callback.called );
 });
 
@@ -10275,7 +10275,7 @@ test('Can also bind the passed context to the event callback.', function() {
         this.color = 'red';
     };
 
-    // How would you get 'this.color' to refer to 'foo' in the changeColor function?
+    // 어떻게 changeColor 함수의 'foo'를 참조하는 'this.color'를 얻는가?
     this.obj.on( 'an event', changeColor, foo );
     this.obj.trigger( 'an event' );
 
@@ -10313,7 +10313,7 @@ test('Also can remove custom events from objects.', function() {
 
     ok( spy2.called );
 
-    // How do you unbind all callbacks tied to the event with a single method
+    // 이벤트와 묶인 모든 콜백을 어떻게 한번의 메쏘드로 푸는가?
     this.obj.off( 'foo' );
     this.obj.trigger( 'foo' );
 
@@ -10321,7 +10321,7 @@ test('Also can remove custom events from objects.', function() {
     ok( spy2.calledOnce, 'Spy 2 called once' );
     ok( spy3.calledOnce, 'Spy 3 called once' );
 
-    // How do you unbind all callbacks and events tied to the object with a single method?
+    // 오브젝트와 묵인 모든 콜백과 이벤트를 어떻게 한번의 메쏘드로 푸는가?
     this.obj.off( 'bar' );
     this.obj.trigger( 'bar' );
 
@@ -10329,9 +10329,9 @@ test('Also can remove custom events from objects.', function() {
 });
 ```
 
-### App
+### 앱
 
-It can also be useful to write specs for any application bootstrap you may have in place. For the following module, our setup initiates and appends a TodoApp view and we can test anything from local instances of views being correctly defined to application interactions correctly resulting in changes to instances of local collections.
+적당한 어플리케이션 부트스트랩을 위한 명세를 작성하는 것도 유용할 수 있다. 다음 모듈을 위해서 설정이 TodoApp 뷰를 초기화해서 추가하고, 우리는 어플리케이션 상호작용에 올바르게 정의된  뷰의 지역 객체의 어떤 것이 지역 컬렉션 객체에 정상적으로 변경하는지  테스트할 수 있다.
 
 ```javascript
 module( 'About Backbone Applications' , {
@@ -10362,9 +10362,9 @@ test( 'Should bind Collection events to View creation.' , function() {
  });
 ```
 
-## Further Reading & Resources
+## 더 읽어볼 것 & 자원
 
-That's it for this section on testing applications with QUnit and SinonJS. I encourage you to try out the [QUnit Backbone.js Koans](https://github.com/addyosmani/backbone-koans-qunit) and see if you can extend some of the examples. For further reading consider looking at some of the additional resources below:
+QUnit과 SinonJS로 어플리케이션을 테스트하는 이 센션의 것은 끝이다. 나는 당신이 [QUnit Backbone.js Koans](https://github.com/addyosmani/backbone-koans-qunit)을 한번 보고 그 예제를 확장할 수 있는지 알아보기 바란다. 더 읽고 싶으면 아래의 추가 자원들을 볼 것을 고려해라:
 
 * **[Test-driven JavaScript Development (book)](http://tddjs.com/)**
 * **[SinonJS/QUnit Adapter](http://sinonjs.org/qunit/)**
@@ -10377,9 +10377,9 @@ That's it for this section on testing applications with QUnit and SinonJS. I enc
 
 
 
-# Resources
+# 자원
 
-## Books &amp; Courses
+## 책 &amp; 수업
 
 * [PeepCode: Backbone.js Basics](https://peepcode.com/products/backbone-js)
 * [CodeSchool: Anatomy Of Backbone](http://www.codeschool.com/courses/anatomy-of-backbonejs)
@@ -10390,7 +10390,7 @@ That's it for this section on testing applications with QUnit and SinonJS. I enc
 * [Backbone Tutorials](http://backbonetutorials.com/)
 * [Derick Baileys Resources For Learning Backbone](http://lostechies.com/derickbailey/2011/09/13/resources-for-and-how-i-learned-backbone-js/)
 
-## Extensions/Libraries
+## 확장 / 라이브러리
 
 * [Backbone Marionette](https://github.com/derickbailey/backbone.marionette)
 * [Thorax](http://walmartlabs.github.com/thorax)
@@ -10403,20 +10403,20 @@ That's it for this section on testing applications with QUnit and SinonJS. I enc
 * [Backbone Validations - HTML5 inspired validations](https://github.com/n-time/backbone.validations)
 
 
-# Conclusions
+# 결론
 
 
-That's it for 'Developing Backbone.js Applications'. I hope you found this book both useful, enlightening and a good start for your journey into exploring Backbone.js.
+'Backbone.js 어플리케이션 개발하기'에 대한 것이 끝났다. 나는 당신에게 이책이 Backbone.js를 살펴보는데 유용하고, 빛을 밝혀주고 좋은 출발점이 되었길 바란다.
 
-If there are other topics or areas of this book you feel could be expanded further, please feel free to let me know, or better yet, send a pull request upstream. I'm always interested in making this title as comprehensive as possible.
+당신이 이 책의 영역중 더 확장할 수 있다고 생각하는 다른 주제가 있다면, 자유롭게 알려주길 바라고 아니면, 아직 좋지는 않지만 상위로 반영해주길 바란다. 나는 항상 제목을 가능한 포괄적으로 하고 싶다.
 
-Until next time, the very best of luck with the rest of your journey!
+다음 번까지, 당신의 여정에 행운이 있기를!
 
-## Notes
+## 주의
 
-I would like to thank the Backbone.js, Stack Overflow, DailyJS (Alex Young) and JavaScript communities for their help, references and contributions to this book. This project would not be possible without you so thank you! :)
+나는 이 책에  도움과 참고, 기여를 해준 Backbone.js, Stack Overflow, DailyJS( Alex YOun ) 그리고 JavaScript 위원회에 감사드리고 싶다. 이 프로젝트는 당신이 없었다면 불가능했기 때문에 당신에게 감사한다! :)
 
 
 ---
+문의 bylee, 2013-
 Where relevant, copyright Addy Osmani, 2012-2013.
-
